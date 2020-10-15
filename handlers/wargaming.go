@@ -63,8 +63,7 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 	intentData, err := intents.GetLoginIntent(c.Params("intentID"))
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
-			"params": c.Params("intentID"),
-			"error":  err.Error(),
+			"error": "Link expired.",
 		})
 	}
 	// Get user data
@@ -103,6 +102,7 @@ func HandleWargamingNewLogin(c *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
+	existingID := db.GetLogin(data.DiscordID)
 	intentID, err := intents.CreateLoginIntent(data)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
@@ -111,7 +111,8 @@ func HandleWargamingNewLogin(c *fiber.Ctx) error {
 	}
 	// Return intentID
 	return c.JSON(fiber.Map{
-		"intent_id": intentID,
+		"intent_id":   intentID,
+		"existing_id": existingID,
 	})
 }
 
