@@ -12,17 +12,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// RedirectRequest - Request from WG auth redirect
-type RedirectRequest struct {
-	Status     string    `json:"status"`
-	Code       int       `json:"code"`
-	Message    string    `json:"message"`
-	Token      string    `json:"access_token"`
-	Expiration time.Time `json:"expires_at"`
-	AccountID  int       `json:"account_id"`
-	Nickname   string    `json:"nickname "`
-}
-
 // LoginRequest - Request to login using WG
 type LoginRequest struct {
 	DiscordID int    `json:"discord_user_id"`
@@ -31,19 +20,12 @@ type LoginRequest struct {
 
 // HandleWargamingRedirect -
 func HandleWargamingRedirect(c *fiber.Ctx) error {
-	var data RedirectRequest
-	// Parse body and params
-	err := c.BodyParser(&data)
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
 	// Check reponse
-	if data.Status != "ok" {
+	if c.Query("status") != "ok" {
 		// Auth failed
-		return c.Status(data.Code).JSON(fiber.Map{
-			"error": data.Message,
+		statusCode, _ := strconv.Atoi(c.Query("code"))
+		return c.Status(statusCode).JSON(fiber.Map{
+			"error": c.Query("message"),
 		})
 	}
 	// Get intent
@@ -53,11 +35,25 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 			"error": "unable to find a valid intent",
 		})
 	}
-	// Add DB record
+	// Parse account id and time
+	accID, err := strconv.Atoi(c.Query("account_id "))
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	i, err := strconv.ParseInt(c.Query("expires_at"), 10, 64)
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	tm := time.Unix(i, 0)
 	intent.Data.Verified = true
-	intent.Data.VerifiedID = data.AccountID
-	intent.Data.VerifiedExpiration = data.Expiration
-	intent.Data.DefaultPID = data.AccountID
+	intent.Data.VerifiedID = accID
+	intent.Data.VerifiedExpiration = tm
+	intent.Data.DefaultPID = accID
+	// Add DB record
 	err = db.UpdateUser(intent.Data, true)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
