@@ -36,7 +36,7 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 		})
 	}
 	// Parse account id and time
-	accID, err := strconv.Atoi(c.Query("account_id "))
+	accID, err := strconv.Atoi(c.Query("account_id"))
 	if err != nil {
 		return c.Status(404).JSON(fiber.Map{
 			"error": err.Error(),
