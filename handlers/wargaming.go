@@ -12,12 +12,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// LoginRequest - Request to login using WG
-type LoginRequest struct {
-	DiscordID int    `json:"discord_user_id"`
-	Realm     string `json:"realm"`
-}
-
 // HandleWargamingRedirect -
 func HandleWargamingRedirect(c *fiber.Ctx) error {
 	// Check reponse
@@ -65,20 +59,21 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 
 // HandleWargamingLogin -
 func HandleWargamingLogin(c *fiber.Ctx) error {
-	IDasInt, err := strconv.Atoi(c.Params("discordID"))
+	// Get intent
+	intentData, err := intents.GetLoginIntent(c.Params("intentID"))
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
+			"error": "Link expired.",
 		})
 	}
 	// Get user data
-	userData, err := db.UserByDiscordID(IDasInt)
+	userData, err := db.UserByDiscordID(intentData.DiscordID)
 	switch err.Error() {
 	case "":
 		break
 	case "mongo: no documents in result":
 		// Create a new user
-		userData = db.UserData{ID: IDasInt}
+		userData = db.UserData{ID: intentData.DiscordID}
 		break
 	default:
 		return c.Status(500).JSON(fiber.Map{
@@ -86,20 +81,41 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 		})
 	}
 	// Create edit intent
-	intentID, err := intents.CreateUserIntent(userData)
+	newIntentID, err := intents.CreateUserIntent(userData)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 	// Get redirect URL
-	redirectURL, err := wgAPIurl(c.Params("realm"), intentID)
+	redirectURL, err := wgAPIurl(intentData.Realm, newIntentID)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 	return c.Redirect(redirectURL)
+}
+
+// HandleWargamingNewLogin -
+func HandleWargamingNewLogin(c *fiber.Ctx) error {
+	var data db.LoginData
+	err := c.BodyParser(&data)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	intentID, err := intents.CreateLoginIntent(data)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	// Return intentID
+	return c.JSON(fiber.Map{
+		"intent_id": intentID,
+	})
 }
 
 func wgAPIurl(realm string, intentID string) (string, error) {

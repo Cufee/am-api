@@ -20,3 +20,16 @@ type UserDataIntent struct {
 	Timestamp time.Time `bson:"timestamp"`
 	Data      UserData  `bson:"data"`
 }
+
+// LoginIntent -
+type LoginIntent struct {
+	IntentID  string    `bson:"_id" json:"-"`
+	Timestamp time.Time `bson:"timestamp" json:"-"`
+	LoginData
+}
+
+// LoginData -
+type LoginData struct {
+	DiscordID int    `bson:"discord_user_id" json:"discord_user_id"`
+	Realm     string `bson:"realm" json:"realm"`
+}

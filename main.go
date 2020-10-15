@@ -13,8 +13,8 @@ func main() {
 
 	// WG login routes
 	app.Get("/redirect/:intentID", h.HandleWargamingRedirect)
-	app.Get("/login/:realm/:discordID", h.HandleWargamingLogin)
-	app.Get("/ping", handlePing)
+	app.Get("/login/:intentID", h.HandleWargamingLogin)
+	app.Get("/newlogin", h.HandleWargamingNewLogin)
 
 	log.Print(app.Listen(":4000"))
 }

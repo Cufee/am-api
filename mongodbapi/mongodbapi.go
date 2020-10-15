@@ -20,14 +20,26 @@ func UpdateUser(newData UserData, upsert bool) error {
 
 // Remove user by DiscordID/WG_player_id
 
-// NewIntent - Add new intent to DB
-func NewIntent(intent UserDataIntent) error {
+// NewUserIntent - Add new intent to DB
+func NewUserIntent(intent UserDataIntent) error {
 	_, err := intentsCollection.InsertOne(ctx, intent)
 	return err
 }
 
-// GetIntent - Commit intent
-func GetIntent(intentID string) (intent UserDataIntent, err error) {
+// GetUserIntent - Get intent
+func GetUserIntent(intentID string) (intent UserDataIntent, err error) {
+	err = intentsCollection.FindOne(ctx, bson.M{"_id": intentID}).Decode(&intent)
+	return intent, err
+}
+
+// NewLoginIntent - Add new intent to DB
+func NewLoginIntent(intent LoginIntent) error {
+	_, err := intentsCollection.InsertOne(ctx, intent)
+	return err
+}
+
+// GetLoginIntent - Get intent
+func GetLoginIntent(intentID string) (intent LoginIntent, err error) {
 	err = intentsCollection.FindOne(ctx, bson.M{"_id": intentID}).Decode(&intent)
 	return intent, err
 }
