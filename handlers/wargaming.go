@@ -29,7 +29,6 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 			"error": "unable to find a valid intent",
 		})
 	}
-	defer db.DeleteIntent(intent.IntentID)
 	// Parse account id and time
 	accID, err := strconv.Atoi(c.Query("account_id"))
 	if err != nil {
@@ -64,10 +63,10 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 	intentData, err := intents.GetLoginIntent(c.Params("intentID"))
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
-			"error": "Link expired.",
+			"params": c.Params("intentID"),
+			"error":  err.Error(),
 		})
 	}
-	defer db.DeleteIntent(intentData.IntentID)
 	// Get user data
 	userData, err := db.UserByDiscordID(intentData.DiscordID)
 	if err != nil {
