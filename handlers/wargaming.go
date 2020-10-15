@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"errors"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/cufee/am-api/config"
@@ -67,21 +69,20 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 
 // HandleWargamingLogin -
 func HandleWargamingLogin(c *fiber.Ctx) error {
-	var data LoginRequest
-	err := c.BodyParser(&data)
+	IDasInt, err := strconv.Atoi(c.Params("discordID"))
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 	// Get user data
-	userData, err := db.UserByDiscordID(data.DiscordID)
+	userData, err := db.UserByDiscordID(IDasInt)
 	switch err.Error() {
 	case "":
 		break
 	case "mongo: no documents in result":
 		// Create a new user
-		userData = db.UserData{ID: data.DiscordID}
+		userData = db.UserData{ID: IDasInt}
 		break
 	default:
 		return c.Status(500).JSON(fiber.Map{
@@ -96,7 +97,7 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 		})
 	}
 	// Get redirect URL
-	redirectURL, err := wgAPIurl(data.Realm, intentID)
+	redirectURL, err := wgAPIurl(c.Params("realm"), intentID)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
@@ -106,6 +107,7 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 }
 
 func wgAPIurl(realm string, intentID string) (string, error) {
+	realm = strings.ToUpper(realm)
 	switch realm {
 	case "NA":
 		return ("https://api.worldoftanks.com/wot/auth/login/?application_id=" + config.WgAPIAppID + "&redirect_uri=" + config.WgBaseRedirectURL + intentID), nil
