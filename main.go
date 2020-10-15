@@ -12,7 +12,7 @@ func main() {
 	app := fiber.New()
 
 	// WG login routes
-	app.Get("/login/redirect/:intentID", h.HandleWargamingRedirect)
+	app.Get("/redirect/:intentID", h.HandleWargamingRedirect)
 	app.Get("/login/:realm/:discordID", h.HandleWargamingLogin)
 	app.Get("/ping", handlePing)
 
