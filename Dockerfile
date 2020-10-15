@@ -8,11 +8,11 @@ WORKDIR /app
 COPY . .
 
 # Run the command inside your image filesystem.
-RUN go build -o build
-RUN chmod +x build/am-api
+RUN go build
+RUN chmod +x am-api
 
 # Add metadata to the image to describe which port the container is listening on at runtime.
-EXPOSE 80
+EXPOSE 4000
 
 # Run the specified command within the container.
-CMD [ "./build/am-api" ]
+CMD [ "./am-api" ]
