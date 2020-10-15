@@ -59,7 +59,7 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 
 // HandleWargamingLogin -
 func HandleWargamingLogin(c *fiber.Ctx) error {
-	// Get intent
+	// Get
 	intentData, err := intents.GetLoginIntent(c.Params("intentID"))
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
@@ -68,17 +68,13 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 	}
 	// Get user data
 	userData, err := db.UserByDiscordID(intentData.DiscordID)
-	switch err.Error() {
-	case "":
-		break
-	case "mongo: no documents in result":
-		// Create a new user
+	if err != nil {
+		if err.Error() != "mongo: no documents in result" {
+			return c.Status(500).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
 		userData = db.UserData{ID: intentData.DiscordID}
-		break
-	default:
-		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
-		})
 	}
 	// Create edit intent
 	newIntentID, err := intents.CreateUserIntent(userData)
