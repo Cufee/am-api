@@ -20,6 +20,12 @@ func UpdateUser(newData UserData, upsert bool) error {
 
 // Remove user by DiscordID/WG_player_id
 
+// DeleteIntent - Add new intent to DB
+func DeleteIntent(intentID string) {
+	intentsCollection.DeleteOne(ctx, bson.M{"_id": intentID})
+	return
+}
+
 // NewUserIntent - Add new intent to DB
 func NewUserIntent(intent UserDataIntent) error {
 	_, err := intentsCollection.InsertOne(ctx, intent)
