@@ -5,14 +5,13 @@ FROM golang
 WORKDIR /app
 
 # Copy the file from your host to your current location.
-COPY . .
+COPY ./build .
 
 # Run the command inside your image filesystem.
-RUN go build
-RUN chmod +x am-api
+RUN chmod +x app
 
 # Add metadata to the image to describe which port the container is listening on at runtime.
 EXPOSE 4000
 
 # Run the specified command within the container.
-CMD [ "./am-api" ]
+CMD [ "./app" ]

@@ -14,6 +14,11 @@ func main() {
 	// WG login routes
 	app.Get("/login/redirect/:intentID", h.HandleWargamingRedirect)
 	app.Get("/login", h.HandleWargamingLogin)
+	app.Get("/ping", handlePing)
 
 	log.Print(app.Listen(":4000"))
+}
+
+func handlePing(c *fiber.Ctx) error {
+	return c.SendString("Pong")
 }

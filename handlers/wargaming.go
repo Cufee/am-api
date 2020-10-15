@@ -79,7 +79,7 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 	switch err.Error() {
 	case "":
 		break
-	case "mongo: no document in result":
+	case "mongo: no documents in result":
 		// Create a new user
 		userData = db.UserData{ID: data.DiscordID}
 		break
@@ -108,13 +108,13 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 func wgAPIurl(realm string, intentID string) (string, error) {
 	switch realm {
 	case "NA":
-		return ("https://api.worldoftanks.com/wot/auth/login/?application_id=" + config.WgAPIAppID + "?redirect_uri=" + config.WgBaseRedirectURL + intentID), nil
+		return ("https://api.worldoftanks.com/wot/auth/login/?application_id=" + config.WgAPIAppID + "&redirect_uri=" + config.WgBaseRedirectURL + intentID), nil
 	case "RU":
-		return ("https://api.worldoftanks.ru/wot/auth/login/?application_id=" + config.WgAPIAppID + "?redirect_uri=" + config.WgBaseRedirectURL + intentID), nil
+		return ("https://api.worldoftanks.ru/wot/auth/login/?application_id=" + config.WgAPIAppID + "&redirect_uri=" + config.WgBaseRedirectURL + intentID), nil
 	case "EU":
-		return ("https://api.worldoftanks.eu/wot/auth/login/?application_id=" + config.WgAPIAppID + "?redirect_uri=" + config.WgBaseRedirectURL + intentID), nil
+		return ("https://api.worldoftanks.eu/wot/auth/login/?application_id=" + config.WgAPIAppID + "&redirect_uri=" + config.WgBaseRedirectURL + intentID), nil
 	case "ASIA":
-		return ("https://api.worldoftanks.asia/wot/auth/login/?application_id=" + config.WgAPIAppID + "?redirect_uri=" + config.WgBaseRedirectURL + intentID), nil
+		return ("https://api.worldoftanks.asia/wot/auth/login/?application_id=" + config.WgAPIAppID + "&redirect_uri=" + config.WgBaseRedirectURL + intentID), nil
 	}
 	return "", errors.New("bad realm")
 }
