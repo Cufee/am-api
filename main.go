@@ -15,5 +15,5 @@ func main() {
 	app.Get("/login/redirect/:intentID", h.HandleWargamingRedirect)
 	app.Get("/login", h.HandleWargamingLogin)
 
-	log.Print(app.Listen(":80"))
+	log.Print(app.Listen(":4000"))
 }
