@@ -17,7 +17,8 @@ func main() {
 	app.Get("/newlogin", h.HandleWargamingNewLogin)
 
 	// Checks
-	app.Get("/players/:discordID", h.HandeleUserCheck)
+	app.Get("/users/:discordID", h.HandeleUserCheck)
+	app.Get("/players/:playerID", h.HandelePlayerCheck)
 
 	log.Print(app.Listen(":4000"))
 }
