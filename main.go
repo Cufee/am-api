@@ -16,6 +16,9 @@ func main() {
 	app.Get("/login/:intentID", h.HandleWargamingLogin)
 	app.Get("/newlogin", h.HandleWargamingNewLogin)
 
+	// Checks
+	app.Get("/players/:playerID", h.HandeleUserCheck)
+
 	log.Print(app.Listen(":4000"))
 }
 
