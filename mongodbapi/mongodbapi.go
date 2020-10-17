@@ -14,8 +14,8 @@ func UserByDiscordID(did int) (user UserData, err error) {
 }
 
 // UserByPlayerID - Get existing user by discordID
-func UserByPlayerID(pid int) (user UserData, err error) {
-	err = userDataCollection.FindOne(ctx, bson.M{"default_player_id": pid}).Decode(&user)
+func UserByPlayerID(did int) (user UserData, err error) {
+	err = userDataCollection.FindOne(ctx, bson.M{"_id": did}).Decode(&user)
 	return user, err
 }
 

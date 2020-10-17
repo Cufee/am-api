@@ -17,13 +17,13 @@ type response struct {
 
 // HandeleUserCheck - Quick user check handler
 func HandeleUserCheck(c *fiber.Ctx) error {
-	playerID, err := strconv.Atoi(c.Params("playerID"))
+	discordID, err := strconv.Atoi(c.Params("discordID"))
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
-	userData, err := db.UserByPlayerID(playerID)
+	userData, err := db.UserByPlayerID(discordID)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
