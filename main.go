@@ -22,7 +22,3 @@ func main() {
 
 	log.Print(app.Listen(":4000"))
 }
-
-func handlePing(c *fiber.Ctx) error {
-	return c.SendString("Pong")
-}

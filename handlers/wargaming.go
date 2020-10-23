@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"fmt"
+	"encoding/json"
+	"net/http"
 	"errors"
 	"strconv"
 	"strings"
@@ -84,7 +87,13 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 		})
 	}
 	// Get redirect URL
-	redirectURL, err := wgAPIurl(intentData.Realm, newIntentID)
+	reqURL, err := wgAPIurl(intentData.Realm, newIntentID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	redirectURL, err := getRedirectURL(reqURL)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
@@ -118,15 +127,42 @@ func HandleWargamingNewLogin(c *fiber.Ctx) error {
 
 func wgAPIurl(realm string, intentID string) (string, error) {
 	realm = strings.ToUpper(realm)
+	tail := config.WgAPIAppID + "&redirect_uri=" + config.WgBaseRedirectURL + intentID + "&nofollow=1"
 	switch realm {
 	case "NA":
-		return ("https://api.worldoftanks.com/wot/auth/login/?application_id=" + config.WgAPIAppID + "&redirect_uri=" + config.WgBaseRedirectURL + intentID), nil
+		return ("https://api.worldoftanks.com/wot/auth/login/?application_id=" + tail), nil
 	case "RU":
-		return ("https://api.worldoftanks.ru/wot/auth/login/?application_id=" + config.WgAPIAppID + "&redirect_uri=" + config.WgBaseRedirectURL + intentID), nil
+		return ("https://api.worldoftanks.ru/wot/auth/login/?application_id=" + tail), nil
 	case "EU":
-		return ("https://api.worldoftanks.eu/wot/auth/login/?application_id=" + config.WgAPIAppID + "&redirect_uri=" + config.WgBaseRedirectURL + intentID), nil
+		return ("https://api.worldoftanks.eu/wot/auth/login/?application_id=" + tail), nil
 	case "ASIA":
-		return ("https://api.worldoftanks.asia/wot/auth/login/?application_id=" + config.WgAPIAppID + "&redirect_uri=" + config.WgBaseRedirectURL + intentID), nil
+		return ("https://api.worldoftanks.asia/wot/auth/login/?application_id=" + tail), nil
 	}
 	return "", errors.New("bad realm")
+}
+
+// Wargaming API Redirect URL
+
+type redirectRes struct {
+	Data struct {
+		Location string `json:"location"`
+	} `json:"data"`
+}
+
+// HTTP client
+var clientHTTP = &http.Client{Timeout: 10 * time.Second}
+
+func getRedirectURL(reqURL string) (string, error) {
+	res, err := clientHTTP.Get(reqURL)
+	if err != nil || res.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("status code: %v. error: %s", res.StatusCode, err)
+	}
+	defer res.Body.Close()
+	// Decode response
+	var resData redirectRes
+	err = json.NewDecoder(res.Body).Decode(&resData)
+	if err != nil {
+		return "", err
+	}
+	return resData.Data.Location, nil
 }
