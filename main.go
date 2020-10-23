@@ -15,6 +15,10 @@ func main() {
 	app.Get("/redirect/:intentID", h.HandleWargamingRedirect)
 	app.Get("/login/:intentID", h.HandleWargamingLogin)
 	app.Get("/newlogin", h.HandleWargamingNewLogin)
+	app.Get("/", func (c *fiber.Ctx) error {
+		c.Redirect("http://byvko.dev")
+		return nil
+	})
 
 	// Checks
 	app.Get("/users/:discordID", h.HandeleUserCheck)
