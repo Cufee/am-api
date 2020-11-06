@@ -11,7 +11,7 @@ COPY ./build .
 RUN chmod +x app
 
 # Add metadata to the image to describe which port the container is listening on at runtime.
-EXPOSE 4000
+EXPOSE 6968
 
 # Run the specified command within the container.
 CMD [ "./app" ]

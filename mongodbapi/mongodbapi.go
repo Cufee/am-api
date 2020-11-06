@@ -15,7 +15,7 @@ func UserByDiscordID(did int) (user UserData, err error) {
 
 // UserByPlayerID - Get existing user by discordID
 func UserByPlayerID(pid int) (user UserData, err error) {
-	err = userDataCollection.FindOne(ctx, bson.M{"default_player_id": pid}).Decode(&user)
+	err = userDataCollection.FindOne(ctx, bson.M{"verified_id": pid}).Decode(&user)
 	return user, err
 }
 
@@ -24,6 +24,32 @@ func UpdateUser(newData UserData, upsert bool) error {
 	opts := options.Update().SetUpsert(upsert)
 	_, err := userDataCollection.UpdateOne(ctx, bson.M{"_id": newData.ID}, bson.M{"$set": newData}, opts)
 	return err
+}
+
+// RemoveOldLogins - Remove all existing logins linked to pid
+func RemoveOldLogins(pid int) error {
+	filter := bson.M{"verified_id": pid}
+	cur, err := userDataCollection.Find(ctx, filter)
+	if err != nil {
+		return err
+	}
+	for cur.Next(ctx) {
+		var u UserData
+		err := cur.Decode(&u)
+		if err != nil {
+			return err
+		}
+
+		u.VerifiedID = 0
+		u.VerifiedExpiration = time.Now()
+
+		_, err = userDataCollection.UpdateOne(ctx, u.ID, bson.M{"$set": u})
+		if err != nil {
+			return err
+		}
+
+	}
+	return nil
 }
 
 // Remove user by DiscordID/WG_player_id

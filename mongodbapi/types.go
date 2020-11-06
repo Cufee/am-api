@@ -5,9 +5,7 @@ import "time"
 // UserData -
 type UserData struct {
 	ID                 int       `bson:"_id,omitempty"`
-	Premium            bool      `bson:"premium,omitempty"`
 	PremiumExpiration  time.Time `bson:"premium_expiration,omitempty"`
-	Verified           bool      `bson:"verified,omitempty"`
 	VerifiedExpiration time.Time `bson:"verified_expiration,omitempty"`
 	VerifiedID         int       `bson:"verified_id,omitempty"`
 	DefaultPID         int       `bson:"default_player_id,omitempty"`

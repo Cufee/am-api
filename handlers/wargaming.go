@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"fmt"
 	"encoding/json"
-	"net/http"
 	"errors"
+	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -25,6 +25,7 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 			"error": c.Query("message"),
 		})
 	}
+
 	// Get intent
 	intent, err := intents.GetUserIntent(c.Params("intentID"))
 	if err != nil {
@@ -32,6 +33,7 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 			"error": "unable to find a valid intent",
 		})
 	}
+
 	// Parse account id and time
 	accID, err := strconv.Atoi(c.Query("account_id"))
 	if err != nil {
@@ -39,16 +41,16 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
+
 	i, err := strconv.ParseInt(c.Query("expires_at"), 10, 64)
 	if err != nil {
 		return c.Status(404).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
-	tm := time.Unix(i, 0)
-	intent.Data.Verified = true
+
 	intent.Data.VerifiedID = accID
-	intent.Data.VerifiedExpiration = tm
+	intent.Data.VerifiedExpiration = time.Unix(i, 0)
 	intent.Data.DefaultPID = accID
 	// Add DB record
 	err = db.UpdateUser(intent.Data, true)
@@ -58,7 +60,7 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 		})
 	}
 	return c.SendString("Login success, you can close this window.")
-}
+} 
 
 // HandleWargamingLogin -
 func HandleWargamingLogin(c *fiber.Ctx) error {

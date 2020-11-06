@@ -15,7 +15,7 @@ func main() {
 	app.Get("/redirect/:intentID", h.HandleWargamingRedirect)
 	app.Get("/login/:intentID", h.HandleWargamingLogin)
 	app.Get("/newlogin", h.HandleWargamingNewLogin)
-	app.Get("/", func (c *fiber.Ctx) error {
+	app.Get("/", func(c *fiber.Ctx) error {
 		c.Redirect("http://byvko.dev")
 		return nil
 	})
@@ -24,5 +24,9 @@ func main() {
 	app.Get("/users/:discordID", h.HandeleUserCheck)
 	app.Get("/players/:playerID", h.HandelePlayerCheck)
 
-	log.Print(app.Listen(":4000"))
+	// Backgrounds
+	app.Get("/setnewbg/:discordID", h.HandleSetNewBG)
+	app.Get("/removebg/:discordID", h.HandleRemoveBG)
+
+	log.Print(app.Listen(":6968"))
 }
