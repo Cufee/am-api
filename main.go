@@ -28,5 +28,5 @@ func main() {
 	app.Get("/setnewbg/:discordID", h.HandleSetNewBG)
 	app.Get("/removebg/:discordID", h.HandleRemoveBG)
 
-	log.Print(app.Listen(":6968"))
+	log.Print(app.Listen(":4000"))
 }
