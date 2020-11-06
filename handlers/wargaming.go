@@ -60,7 +60,7 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 		})
 	}
 	return c.SendString("Login success, you can close this window.")
-} 
+}
 
 // HandleWargamingLogin -
 func HandleWargamingLogin(c *fiber.Ctx) error {
@@ -79,7 +79,7 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 				"error": err.Error(),
 			})
 		}
-		userData = db.UserData{ID: intentData.DiscordID}
+		userData = db.UserData{ID: intentData.DiscordID, PremiumExpiration: time.Now().Add(time.Hour * 7 * 24)}
 	}
 	// Create edit intent
 	newIntentID, err := intents.CreateUserIntent(userData)
