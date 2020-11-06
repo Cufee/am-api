@@ -9,27 +9,24 @@ import (
 )
 
 func main() {
-	externalApp := fiber.New()
-	internalApp := fiber.New()
+	app := fiber.New()
 
 	// WG login routes
-	externalApp.Get("/newlogin", h.HandleWargamingNewLogin)
-	externalApp.Get("/", func(c *fiber.Ctx) error {
+	app.Get("/redirect/:intentID", h.HandleWargamingRedirect)
+	app.Get("/login/:intentID", h.HandleWargamingLogin)
+	app.Get("/newlogin", h.HandleWargamingNewLogin)
+	app.Get("/", func(c *fiber.Ctx) error {
 		c.Redirect("http://byvko.dev")
 		return nil
 	})
 
-	// Login
-	internalApp.Get("/redirect/:intentID", h.HandleWargamingRedirect)
-	internalApp.Get("/login/:intentID", h.HandleWargamingLogin)
-
 	// Checks
-	internalApp.Get("/users/:discordID", h.HandeleUserCheck)
-	internalApp.Get("/players/:playerID", h.HandelePlayerCheck)
+	app.Get("/users/:discordID", h.HandeleUserCheck)
+	app.Get("/players/:playerID", h.HandelePlayerCheck)
 
 	// Backgrounds
-	internalApp.Get("/setnewbg/:discordID", h.HandleSetNewBG)
-	internalApp.Get("/removebg/:discordID", h.HandleRemoveBG)
+	app.Get("/setnewbg/:discordID", h.HandleSetNewBG)
+	app.Get("/removebg/:discordID", h.HandleRemoveBG)
 
-	go log.Print(externalApp.Listen(":4000"))
+	log.Print(app.Listen(":4000"))
 }
