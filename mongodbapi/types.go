@@ -12,6 +12,15 @@ type UserData struct {
 	CustomBgURL        string    `bson:"custom_bg,omitempty"`
 }
 
+// BanData -
+type BanData struct {
+	UserID     int       `bson:"user_id"`
+	Reason     string    `bson:"reason"`
+	Notified   bool      `bson:"notified"`
+	Timestamp  time.Time `bson:"timestamp"`
+	Expiration time.Time `bson:"expiration"`
+}
+
 // UserDataIntent - Intent to edit User data
 type UserDataIntent struct {
 	IntentID  string    `bson:"_id"`

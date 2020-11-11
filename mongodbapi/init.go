@@ -14,6 +14,7 @@ import (
 // Collections
 var userDataCollection *mongo.Collection
 var intentsCollection *mongo.Collection
+var bansCollection *mongo.Collection
 var ctx = context.TODO()
 
 func init() {
@@ -36,4 +37,5 @@ func init() {
 	// Collections
 	userDataCollection = client.Database("webapp").Collection("users")
 	intentsCollection = client.Database("webapp").Collection("intents")
+	bansCollection = client.Database("webapp").Collection("bans")
 }

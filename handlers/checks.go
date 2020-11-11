@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"strconv"
 	"time"
 
@@ -9,10 +10,16 @@ import (
 )
 
 type response struct {
-	DefaultPID  int    `json:"player_id"`
-	Premium     bool   `json:"premium"`
-	Verified    bool   `json:"verified"`
+	DefaultPID int `json:"player_id"`
+
+	Premium  bool `json:"premium"`
+	Verified bool `json:"verified"`
+
 	CustomBgURL string `json:"bg_url"`
+
+	Banned      bool   `json:"banned"`
+	BanReason   string `json:"ban_reason,omitempty"`
+	BanNotified bool   `json:"ban_notified,omitempty"`
 }
 
 // HandeleUserCheck - Quick user check handler
@@ -30,6 +37,19 @@ func HandeleUserCheck(c *fiber.Ctx) error {
 		})
 	}
 	var resData response
+
+	// Get ban data
+	banData, err := db.BanCheck(userData.ID)
+	if err != nil && err.Error() != "mongo: no documents in result" {
+		log.Println(err)
+	}
+
+	if banData.UserID == userData.ID {
+		resData.Banned = true
+		resData.BanReason = banData.Reason
+		resData.BanNotified = banData.Notified
+	}
+
 	resData.DefaultPID = userData.DefaultPID
 	resData.Premium = false
 	if time.Now().Before(userData.PremiumExpiration) {
@@ -45,6 +65,7 @@ func HandeleUserCheck(c *fiber.Ctx) error {
 
 // HandelePlayerCheck - Quick user check handler
 func HandelePlayerCheck(c *fiber.Ctx) error {
+	// Get user data
 	playerID, err := strconv.Atoi(c.Params("playerID"))
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
@@ -57,7 +78,21 @@ func HandelePlayerCheck(c *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
+
 	var resData response
+
+	// Get ban data
+	banData, err := db.BanCheck(userData.ID)
+	if err != nil && err.Error() != "mongo: no document in result" {
+		log.Println(err)
+	}
+
+	if banData.UserID == userData.ID {
+		resData.Banned = true
+		resData.BanReason = banData.Reason
+		resData.BanNotified = banData.Notified
+	}
+
 	resData.DefaultPID = userData.DefaultPID
 	resData.Premium = false
 	if time.Now().Before(userData.PremiumExpiration) {

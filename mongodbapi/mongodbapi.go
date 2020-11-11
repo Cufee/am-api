@@ -94,3 +94,29 @@ func GetLoginIntent(intentID string) (intent LoginIntent, err error) {
 	err = intentsCollection.FindOne(ctx, bson.M{"_id": intentID}).Decode(&intent)
 	return intent, err
 }
+
+// GetBanData - Get existing ban data
+func GetBanData(userID int, days int) (data BanData, err error) {
+	// Make a filter by user id and ban timestamp
+	timestamp := time.Now().Add(time.Duration(-days) * 24 * 60 * time.Minute)
+	filter := bson.M{"user_id": userID, "timestamp": bson.M{"$gt": timestamp}}
+
+	err = bansCollection.FindOne(ctx, filter).Decode(&data)
+	return data, err
+}
+
+// BanCheck - Check if a user is banned
+func BanCheck(userID int) (data BanData, err error) {
+	// Make a filter by user id and ban expiration
+	filter := bson.M{"user_id": userID, "expiration": bson.M{"$gt": time.Now()}}
+
+	err = bansCollection.FindOne(ctx, filter).Decode(&data)
+	return data, err
+}
+
+// AddBanData - Add new ban entry
+func AddBanData(data BanData) (err error) {
+	// Insert ban object
+	_, err = intentsCollection.InsertOne(ctx, data)
+	return err
+}
