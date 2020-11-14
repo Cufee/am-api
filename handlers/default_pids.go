@@ -64,6 +64,13 @@ func HandleNewDefaultPID(c *fiber.Ctx) error {
 		userData.VerifiedExpiration = time.Now().Add(-1 * time.Minute)
 	}
 
+	// Update DB
+	err = db.UpdateUser(userData, true)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
 	// Make response
 	var resData pidChangeRes
 
