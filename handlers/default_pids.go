@@ -44,6 +44,7 @@ func HandleNewDefaultPID(c *fiber.Ctx) error {
 	if userData.VerifiedID != 0 {
 		oldPID = userData.VerifiedID
 	}
+	userData.DefaultPID = newPlayerID
 
 	// Create a new user record if one does not exist
 	if err != nil && err.Error() == "mongo: no documents in result" {
@@ -71,6 +72,7 @@ func HandleNewDefaultPID(c *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
+
 	// Make response
 	var resData pidChangeRes
 
