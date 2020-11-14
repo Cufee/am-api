@@ -52,7 +52,16 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 	intent.Data.VerifiedID = accID
 	intent.Data.VerifiedExpiration = time.Unix(i, 0)
 	intent.Data.DefaultPID = accID
-	// Add DB record
+
+	// Clear any existing logins for this accID
+	err = db.RemoveOldLogins(accID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// Add/Update DB record
 	err = db.UpdateUser(intent.Data, true)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{

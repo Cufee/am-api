@@ -51,14 +51,18 @@ func HandeleUserCheck(c *fiber.Ctx) error {
 	}
 
 	resData.DefaultPID = userData.DefaultPID
+
+	// Check premium status
 	resData.Premium = false
 	if time.Now().Before(userData.PremiumExpiration) {
 		resData.Premium = true
 		resData.CustomBgURL = userData.CustomBgURL
 	}
+	// Check verification status
 	resData.Verified = false
 	if time.Now().Before(userData.VerifiedExpiration) {
 		resData.Verified = true
+		resData.DefaultPID = userData.VerifiedID
 	}
 	return c.JSON(resData)
 }

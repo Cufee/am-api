@@ -22,6 +22,7 @@ func main() {
 
 	// Checks
 	app.Get("/users/:discordID", h.HandeleUserCheck)
+	app.Put("/users/:discordID/newdef/:playerID", h.HandleNewDefaultPID)
 	app.Get("/players/:playerID", h.HandelePlayerCheck)
 
 	// Backgrounds

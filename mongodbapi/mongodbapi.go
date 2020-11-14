@@ -13,7 +13,7 @@ func UserByDiscordID(did int) (user UserData, err error) {
 	return user, err
 }
 
-// UserByPlayerID - Get existing user by discordID
+// UserByPlayerID - Get existing user by playerID
 func UserByPlayerID(pid int) (user UserData, err error) {
 	err = userDataCollection.FindOne(ctx, bson.M{"verified_id": pid}).Decode(&user)
 	return user, err
@@ -47,12 +47,12 @@ func RemoveOldLogins(pid int) error {
 		if err != nil {
 			return err
 		}
-
 	}
 	return nil
 }
 
 // Remove user by DiscordID/WG_player_id
+// TBD
 
 // DeleteIntent - Add new intent to DB
 func DeleteIntent(intentID string) {
