@@ -42,6 +42,13 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 		})
 	}
 
+	// Check if accID exists
+	if accID == 0 {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Wargaming did not return a valid account ID, please report this error.",
+		})
+	}
+
 	i, err := strconv.ParseInt(c.Query("expires_at"), 10, 64)
 	if err != nil {
 		return c.Status(404).JSON(fiber.Map{
@@ -88,8 +95,9 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 				"error": err.Error(),
 			})
 		}
-		userData = db.UserData{ID: intentData.DiscordID, PremiumExpiration: time.Now().Add(time.Hour * 7 * 24)}
+		userData = db.UserData{ID: intentData.DiscordID}
 	}
+
 	// Create edit intent
 	newIntentID, err := intents.CreateUserIntent(userData)
 	if err != nil {

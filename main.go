@@ -29,5 +29,9 @@ func main() {
 	app.Get("/setnewbg/:discordID", h.HandleSetNewBG)
 	app.Get("/removebg/:discordID", h.HandleRemoveBG)
 
+	// Premium
+	app.Get("/premium/add", h.HandleNewPremiumIntent)
+	app.Get("/premium/redirect/:intentID", h.HandleUpdateRedirect)
+
 	log.Print(app.Listen(":4000"))
 }
