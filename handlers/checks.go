@@ -87,7 +87,7 @@ func HandelePlayerCheck(c *fiber.Ctx) error {
 
 	// Get ban data
 	banData, err := db.BanCheck(userData.ID)
-	if err != nil && err.Error() != "mongo: no document in result" {
+	if err != nil && err.Error() != "mongo: no documents in result" {
 		log.Println(err)
 	}
 
