@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -37,6 +38,7 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 	// Parse account id and time
 	accID, err := strconv.Atoi(c.Query("account_id"))
 	if err != nil {
+		log.Print(err.Error())
 		return c.Status(404).JSON(fiber.Map{
 			"error": fmt.Sprintf("atoi error: %v", err.Error()),
 		})
@@ -51,6 +53,7 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 
 	i, err := strconv.ParseInt(c.Query("expires_at"), 10, 64)
 	if err != nil {
+		log.Print(err.Error())
 		return c.Status(404).JSON(fiber.Map{
 			"error": fmt.Sprintf("parse int error: %v", err.Error()),
 		})
@@ -63,14 +66,19 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 	// Clear any existing logins for this accID
 	err = db.RemoveOldLogins(accID)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": fmt.Sprintf("remove old login error: %v", err.Error()),
-		})
+		if err.Error() != "mongo: no documents in result" {
+			log.Print(err.Error())
+			return c.Status(500).JSON(fiber.Map{
+				"error": fmt.Sprintf("remove old login error: %v", err.Error()),
+			})
+		}
+		err = nil
 	}
 
 	// Add/Update DB record
 	err = db.UpdateUser(intent.Data, true)
 	if err != nil {
+		log.Print(err.Error())
 		return c.Status(500).JSON(fiber.Map{
 			"error": fmt.Sprintf("update user error: %v", err.Error()),
 		})
@@ -91,6 +99,7 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 	userData, err := db.UserByDiscordID(intentData.DiscordID)
 	if err != nil {
 		if err.Error() != "mongo: no documents in result" {
+			log.Print(err.Error())
 			return c.Status(500).JSON(fiber.Map{
 				"error": err.Error(),
 			})
@@ -101,6 +110,7 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 	// Create edit intent
 	newIntentID, err := intents.CreateUserIntent(userData)
 	if err != nil {
+		log.Print(err.Error())
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -108,12 +118,14 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 	// Get redirect URL
 	reqURL, err := wgAPIurl(intentData.Realm, newIntentID)
 	if err != nil {
+		log.Print(err.Error())
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 	redirectURL, err := getRedirectURL(reqURL)
 	if err != nil {
+		log.Print(err.Error())
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -126,6 +138,7 @@ func HandleWargamingNewLogin(c *fiber.Ctx) error {
 	var data db.LoginData
 	err := c.BodyParser(&data)
 	if err != nil {
+		log.Print(err.Error())
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -133,6 +146,7 @@ func HandleWargamingNewLogin(c *fiber.Ctx) error {
 	existingID := db.GetLogin(data.DiscordID)
 	intentID, err := intents.CreateLoginIntent(data)
 	if err != nil {
+		log.Print(err.Error())
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
