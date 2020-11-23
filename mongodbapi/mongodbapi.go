@@ -43,7 +43,7 @@ func RemoveOldLogins(pid int) error {
 		u.VerifiedID = 0
 		u.VerifiedExpiration = time.Now()
 
-		_, err = userDataCollection.UpdateOne(ctx, u.ID, bson.M{"$set": u})
+		_, err = userDataCollection.UpdateOne(ctx, bson.M{"_id": u.ID}, bson.M{"$set": u})
 		if err != nil {
 			return err
 		}
