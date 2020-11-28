@@ -227,13 +227,8 @@ func subDeactivated(data webhookEvent) {
 
 	// Get user data
 	userData, err := db.UserByDiscordID(paymentIntent.Data.UserID)
-	if userData.ExcessPremiumMin < 1 {
-		userData.PremiumExpiration = time.Now()
-		userData.ExcessPremiumMin = 0
-	} else {
-		userData.PremiumExpiration = time.Now().Add(time.Duration(userData.ExcessPremiumMin) * time.Minute)
-		userData.ExcessPremiumMin = 0
-	}
+	userData.PremiumExpiration = time.Now().Add(time.Duration(userData.ExcessPremiumMin) * time.Minute)
+	userData.ExcessPremiumMin = 1 // Using one bc this field has omitempty
 
 	// Update user
 	err = db.UpdateUser(userData, false)
