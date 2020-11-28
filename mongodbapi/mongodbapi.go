@@ -133,6 +133,12 @@ func GetPaymentIntent(intentID string) (intent PayPalPaymentIntent, err error) {
 	return intent, err
 }
 
+// GetPaymentIntentBySubID - Get intent by Subscription ID
+func GetPaymentIntentBySubID(subID string) (intent PayPalPaymentIntent, err error) {
+	err = paymentsCollection.FindOne(ctx, bson.M{"sub_id": subID}).Decode(&intent)
+	return intent, err
+}
+
 // UpdatePaymentIntent - Get intent
 func UpdatePaymentIntent(intent PayPalPaymentIntent) (err error) {
 	opts := options.Update().SetUpsert(false)

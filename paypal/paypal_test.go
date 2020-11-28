@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestCDNUpload(t *testing.T) {
+func AddMockIntent(t *testing.T) {
 	//
 }

@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/cufee/am-api/config"
 	"github.com/cufee/am-api/intents"
@@ -123,7 +124,7 @@ func HandleNewSub(ctx *fiber.Ctx) error {
 	// Update intent
 	paymentIntent.Data.PatchLink = patchLink
 	paymentIntent.Data.SubID = subRes.ID
-	paymentIntent.Data.Status = subRes.SubscriptionStatus
+	paymentIntent.Data.Status = string(subRes.SubscriptionStatus)
 	err = db.UpdatePaymentIntent(paymentIntent)
 
 	return ctx.JSON(fiber.Map{
@@ -146,20 +147,24 @@ func HandlePaymentEvent(ctx *fiber.Ctx) error {
 	case "BILLING.SUBSCRIPTION.ACTIVATED":
 		subActivated(event)
 
+	case "BILLING.SUBSCRIPTION.RENEWED":
+		subActivated(event)
+
 	case "BILLING.PLAN.DEACTIVATED":
 		subDeactivated(event)
 
 	case "BILLING.SUBSCRIPTION.CANCELLED":
-		subCancelled(event)
+		subDeactivated(event)
 
 	case "BILLING.SUBSCRIPTION.SUSPENDED":
-		subSuspended(event)
+		subDeactivated(event)
 
 	case "BILLING.SUBSCRIPTION.PAYMENT.FAILED":
-		subPaymentFaield(event)
+		// subPaymentFaield(event) - No code
+		subDeactivated(event)
 
 	case "BILLING.SUBSCRIPTION.EXPIRED":
-		subExpired(event)
+		subDeactivated(event)
 
 	default:
 		// Undandled event
@@ -169,43 +174,86 @@ func HandlePaymentEvent(ctx *fiber.Ctx) error {
 }
 
 func subActivated(data webhookEvent) {
-	// Subscription activated
+	// Subscription activated or renewed
 	// Add premium status to user
-	//
-	log.Print(data.EventType, data.Links[1])
+
+	// Get intent
+	paymentIntent, err := db.GetPaymentIntentBySubID(data.Resource.ID)
+	if err != nil {
+		log.Print(fmt.Sprintf("error getting payment intent for sub_id %s: %s", data.Resource.ID, err.Error()))
+		return
+	}
+
+	// Get user data
+	userData, err := db.UserByDiscordID(paymentIntent.Data.UserID)
+	if userData.PremiumExpiration.After(time.Now()) {
+		userData.ExcessPremiumMin = int(userData.PremiumExpiration.Sub(time.Now()) / time.Minute)
+	}
+
+	// Parse next renewal date
+	nextPaymentDate, err := time.Parse("2014-10-22T23:48:22Z", data.Resource.BillingInfo.NextBillingTime)
+	if err != nil {
+		log.Print(fmt.Sprintf("error parsing next billing time for sub_id %s: %s", data.Resource.ID, err.Error()))
+		return
+	}
+
+	// Add premium and commit
+	userData.PremiumExpiration = nextPaymentDate
+	err = db.UpdateUser(userData, false)
+	if err != nil {
+		log.Print(fmt.Sprintf("error updating user for sub_id %s: %s", data.Resource.ID, err.Error()))
+		return
+	}
+
+	// Update intent
+	paymentIntent.Data.Status = data.Resource.Status
+	err = db.UpdatePaymentIntent(paymentIntent)
+	if err != nil {
+		log.Print(fmt.Sprintf("error updating payment intent for sub_id %s: %s", data.Resource.ID, err.Error()))
+		return
+	}
 }
 
 func subDeactivated(data webhookEvent) {
 	// Subscription deactivated
 	// Suspend premium account
-	//
-	log.Print(data.EventType, data.Links[1])
-}
 
-func subCancelled(data webhookEvent) {
-	// Subscription cancelled
-	// Suspend premium
-	//
-	log.Print(data.EventType, data.Links[1])
-}
+	// Get intent
+	paymentIntent, err := db.GetPaymentIntentBySubID(data.Resource.ID)
+	if err != nil {
+		log.Print(fmt.Sprintf("error getting payment intent for sub_id %s: %s", data.Resource.ID, err.Error()))
+		return
+	}
 
-func subSuspended(data webhookEvent) {
-	// Subscription suspended
-	// Suspend premium, notify owner
-	//
-	log.Print(data.EventType, data.Links[1])
+	// Get user data
+	userData, err := db.UserByDiscordID(paymentIntent.Data.UserID)
+	if userData.ExcessPremiumMin < 1 {
+		userData.PremiumExpiration = time.Now()
+		userData.ExcessPremiumMin = 0
+	} else {
+		userData.PremiumExpiration = time.Now().Add(time.Duration(userData.ExcessPremiumMin) * time.Minute)
+		userData.ExcessPremiumMin = 0
+	}
+
+	// Update user
+	err = db.UpdateUser(userData, false)
+	if err != nil {
+		log.Print(fmt.Sprintf("error updating user for sub_id %s: %s", data.Resource.ID, err.Error()))
+		return
+	}
+
+	// Update intent
+	paymentIntent.Data.Status = data.Resource.Status
+	err = db.UpdatePaymentIntent(paymentIntent)
+	if err != nil {
+		log.Print(fmt.Sprintf("error updating payment intent for sub_id %s: %s", data.Resource.ID, err.Error()))
+		return
+	}
 }
 
 func subPaymentFaield(data webhookEvent) {
 	// Subscription payment failed
 	// Notify user, set expiration to time.Now() + 25hr
-	//
-	log.Print(data.EventType, data.Links[1])
-}
-
-func subExpired(data webhookEvent) {
-	// Subscription expired
-	// Send a notification.
 	//
 	log.Print(data.EventType, data.Links[1])
 }
