@@ -44,7 +44,7 @@ func HandeleUserCheck(c *fiber.Ctx) error {
 		log.Println(err)
 	}
 
-	if banData.UserID == userData.ID {
+	if banData.UserID == userData.ID && banData.Expiration.After(time.Now()) {
 		resData.Banned = true
 		resData.BanReason = banData.Reason
 		resData.BanNotified = banData.Notified

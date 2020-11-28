@@ -71,7 +71,7 @@ func HandleNewPremiumIntent(c *fiber.Ctx) error {
 // HandleUpdateRedirect -
 func HandleUpdateRedirect(c *fiber.Ctx) error {
 	// Get intent
-	intent, err := intents.GetUserIntent(c.Params("intentID"))
+	intent, err := db.GetUserIntent(c.Params("intentID"))
 	if err != nil {
 		return c.Status(404).JSON(fiber.Map{
 			"error": "unable to find a valid intent",

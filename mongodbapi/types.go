@@ -1,11 +1,18 @@
 package mongodbapi
 
-import "time"
+import (
+	"time"
+)
+
+//
+// User data
+//
 
 // UserData -
 type UserData struct {
 	ID                 int       `bson:"_id,omitempty"`
 	PremiumExpiration  time.Time `bson:"premium_expiration,omitempty"`
+	ExcessPremiumMin   int       `bson:"excess_premium_min,omitempty"`
 	VerifiedExpiration time.Time `bson:"verified_expiration,omitempty"`
 	VerifiedID         int       `bson:"verified_id,omitempty"`
 	DefaultPID         int       `bson:"default_player_id,omitempty"`
@@ -28,6 +35,10 @@ type UserDataIntent struct {
 	Data      UserData  `bson:"data"`
 }
 
+//
+// Logins
+//
+
 // LoginIntent -
 type LoginIntent struct {
 	IntentID  string    `bson:"_id" json:"-"`
@@ -39,4 +50,25 @@ type LoginIntent struct {
 type LoginData struct {
 	DiscordID int    `bson:"discord_user_id" json:"discord_user_id"`
 	Realm     string `bson:"realm" json:"realm"`
+}
+
+//
+// Payments
+//
+
+// PayPalPaymentIntentData - Data for a payment intent
+type PayPalPaymentIntentData struct {
+	UserID    int    `bson:"user_id"`
+	SubID     string `bson:"sub_id"`
+	PlanID    string `bson:"plan_id"`
+	PatchLink string `bson:"patch_link"`
+	Status    string `bson:"status"`
+}
+
+// PayPalPaymentIntent - Intent for a paypal payment
+type PayPalPaymentIntent struct {
+	IntentID   string                  `bson:"_id"`
+	Timestamp  time.Time               `bson:"timestamp"`
+	LastUpdate time.Time               `bson:"last_update"`
+	Data       PayPalPaymentIntentData `bson:"data"`
 }

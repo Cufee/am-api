@@ -6,6 +6,7 @@ WORKDIR /app
 
 # Copy the file from your host to your current location.
 COPY ./build .
+COPY ./paypal/auth ./paypal/auth
 
 # Run the command inside your image filesystem.
 RUN chmod +x app
