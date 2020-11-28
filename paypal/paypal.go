@@ -28,7 +28,7 @@ func makePayPalClient(debug bool) (pc *paypal.Client, err error) {
 	}
 
 	// Create a client instance
-	pc, err = paypal.NewClient(clientID, secretID, paypal.APIBaseSandBox)
+	pc, err = paypal.NewClient(clientID, secretID, paypal.APIBaseLive)
 	if err != nil {
 		return nil, err
 	}
