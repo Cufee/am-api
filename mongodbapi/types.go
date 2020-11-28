@@ -12,6 +12,7 @@ import (
 type UserData struct {
 	ID                 int       `bson:"_id,omitempty"`
 	PremiumExpiration  time.Time `bson:"premium_expiration,omitempty"`
+	HasPremiumSub      bool      `bson:"has_premium_sub,omitempty"`
 	ExcessPremiumMin   int       `bson:"excess_premium_min,omitempty"`
 	VerifiedExpiration time.Time `bson:"verified_expiration,omitempty"`
 	VerifiedID         int       `bson:"verified_id,omitempty"`

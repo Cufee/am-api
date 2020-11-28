@@ -64,6 +64,13 @@ func HandleNewSub(ctx *fiber.Ctx) error {
 		})
 	}
 
+	// Check if user already has an active subscription
+	if userData.HasPremiumSub {
+		return ctx.JSON(fiber.Map{
+			"error": "already subscribed",
+		})
+	}
+
 	var paymentData db.PayPalPaymentIntentData
 	paymentData.UserID = userData.ID
 	paymentData.PlanID = monthlyRegularPlan.PlanID
@@ -194,6 +201,7 @@ func subActivated(data webhookEvent) {
 	if userData.PremiumExpiration.After(time.Now()) {
 		userData.ExcessPremiumMin = int(userData.PremiumExpiration.Sub(time.Now()) / time.Minute)
 	}
+	userData.HasPremiumSub = true
 
 	// Parse next renewal date
 	nextPaymentDate, err := time.Parse(time.RFC3339, data.Resource.BillingInfo.NextBillingTime)
@@ -234,6 +242,7 @@ func subDeactivated(data webhookEvent) {
 	userData, err := db.UserByDiscordID(paymentIntent.Data.UserID)
 	userData.PremiumExpiration = time.Now().Add(time.Duration(userData.ExcessPremiumMin) * time.Minute)
 	userData.ExcessPremiumMin = 1 // Using one bc this field has omitempty
+	userData.HasPremiumSub = false
 
 	// Update user
 	err = db.UpdateUser(userData, false)
