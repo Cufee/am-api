@@ -156,8 +156,9 @@ func HandlePaymentEvent(ctx *fiber.Ctx) error {
 	case "BILLING.PLAN.DEACTIVATED":
 		subDeactivated(event)
 
-	case "BILLING.SUBSCRIPTION.CANCELLED":
-		subDeactivated(event)
+	// Need better code, not needed atm
+	// case "BILLING.SUBSCRIPTION.CANCELLED":
+	// 	subDeactivated(event)
 
 	case "BILLING.SUBSCRIPTION.SUSPENDED":
 		subDeactivated(event)

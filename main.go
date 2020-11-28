@@ -37,6 +37,7 @@ func main() {
 
 	// Payments
 	app.Get("/payments/new/:discordID", paypal.HandleNewSub)
+	app.Get("/payments/redirect", func(ctx *fiber.Ctx) error { return ctx.Redirect("https://aftermath.link", 301) })
 	app.Post("/payments/events", paypal.HandlePaymentEvent)
 
 	log.Print(app.Listen(":4000"))
