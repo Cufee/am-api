@@ -28,7 +28,7 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 	}
 
 	// Get intent
-	intent, err := intents.GetUserIntent(c.Params("intentID"))
+	intent, err := db.GetUserIntent(c.Params("intentID"))
 	if err != nil {
 		return c.Status(404).JSON(fiber.Map{
 			"error": "unable to find a valid intent",
@@ -89,7 +89,7 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 // HandleWargamingLogin -
 func HandleWargamingLogin(c *fiber.Ctx) error {
 	// Get
-	intentData, err := intents.GetLoginIntent(c.Params("intentID"))
+	intentData, err := db.GetLoginIntent(c.Params("intentID"))
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": "Link expired.",
@@ -108,7 +108,7 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 	}
 
 	// Create edit intent
-	newIntentID, err := intents.CreateUserIntent(userData)
+	newIntent, err := intents.CreateUserIntent(userData)
 	if err != nil {
 		log.Print(err.Error())
 		return c.Status(500).JSON(fiber.Map{
@@ -116,7 +116,7 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 		})
 	}
 	// Get redirect URL
-	reqURL, err := wgAPIurl(intentData.Realm, newIntentID)
+	reqURL, err := wgAPIurl(intentData.Realm, newIntent.IntentID)
 	if err != nil {
 		log.Print(err.Error())
 		return c.Status(500).JSON(fiber.Map{

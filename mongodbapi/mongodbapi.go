@@ -41,7 +41,7 @@ func RemoveOldLogins(pid int) error {
 		}
 
 		u.VerifiedID = 0
-		u.VerifiedExpiration = time.Now()
+		u.VerifiedExpiration = time.Time{}
 
 		_, err = userDataCollection.UpdateOne(ctx, bson.M{"_id": u.ID}, bson.M{"$set": u})
 		if err != nil {
@@ -83,22 +83,10 @@ func GetLogin(discordID int) int {
 	return 0
 }
 
-// NewLoginIntent - Add new intent to DB
-func NewLoginIntent(intent LoginIntent) error {
-	_, err := intentsCollection.InsertOne(ctx, intent)
-	return err
-}
-
-// GetLoginIntent - Get intent
-func GetLoginIntent(intentID string) (intent LoginIntent, err error) {
-	err = intentsCollection.FindOne(ctx, bson.M{"_id": intentID}).Decode(&intent)
-	return intent, err
-}
-
 // GetBanData - Get existing ban data
 func GetBanData(userID int, days int) (data BanData, err error) {
 	// Make a filter by user id and ban timestamp
-	timestamp := time.Now().Add(time.Duration(-days) * 24 * 60 * time.Minute)
+	timestamp := time.Now().Add(time.Duration(-days) * 24 * time.Hour)
 	filter := bson.M{"user_id": userID, "timestamp": bson.M{"$gt": timestamp}}
 
 	err = bansCollection.FindOne(ctx, filter).Decode(&data)
@@ -118,5 +106,36 @@ func BanCheck(userID int) (data BanData, err error) {
 func AddBanData(data BanData) (err error) {
 	// Insert ban object
 	_, err = intentsCollection.InsertOne(ctx, data)
+	return err
+}
+
+// NewLoginIntent - Add new intent to DB
+func NewLoginIntent(intent LoginIntent) error {
+	_, err := intentsCollection.InsertOne(ctx, intent)
+	return err
+}
+
+// GetLoginIntent - Get intent
+func GetLoginIntent(intentID string) (intent LoginIntent, err error) {
+	err = intentsCollection.FindOne(ctx, bson.M{"_id": intentID}).Decode(&intent)
+	return intent, err
+}
+
+// NewPaymentIntent - Add new intent to DB
+func NewPaymentIntent(intent PayPalPaymentIntent) error {
+	_, err := paymentsCollection.InsertOne(ctx, intent)
+	return err
+}
+
+// GetPaymentIntent - Get intent
+func GetPaymentIntent(intentID string) (intent PayPalPaymentIntent, err error) {
+	err = paymentsCollection.FindOne(ctx, bson.M{"_id": intentID}).Decode(&intent)
+	return intent, err
+}
+
+// UpdatePaymentIntent - Get intent
+func UpdatePaymentIntent(intent PayPalPaymentIntent) (err error) {
+	opts := options.Update().SetUpsert(false)
+	_, err = paymentsCollection.UpdateOne(ctx, bson.M{"_id": intent.IntentID}, bson.M{"$set": bson.M{"data": intent.Data, "last_update": time.Now()}}, opts)
 	return err
 }

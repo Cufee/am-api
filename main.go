@@ -4,6 +4,7 @@ import (
 	"log"
 
 	h "github.com/cufee/am-api/handlers"
+	"github.com/cufee/am-api/paypal"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -31,7 +32,12 @@ func main() {
 
 	// Premium
 	app.Get("/premium/add", h.HandleNewPremiumIntent)
+	app.Get("/premium/newintent", h.HandleNewPremiumIntent)
 	app.Get("/premium/redirect/:intentID", h.HandleUpdateRedirect)
+
+	// Payments
+	app.Get("/payments/new/:discordID", paypal.HandleNewSub)
+	app.Post("/payments/events", paypal.HandlePaymentEvent)
 
 	log.Print(app.Listen(":4000"))
 }

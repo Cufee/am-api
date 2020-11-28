@@ -1,6 +1,14 @@
 package mongodbapi
 
-import "time"
+import (
+	"time"
+
+	"github.com/plutov/paypal/v3"
+)
+
+//
+// User data
+//
 
 // UserData -
 type UserData struct {
@@ -28,6 +36,10 @@ type UserDataIntent struct {
 	Data      UserData  `bson:"data"`
 }
 
+//
+// Logins
+//
+
 // LoginIntent -
 type LoginIntent struct {
 	IntentID  string    `bson:"_id" json:"-"`
@@ -39,4 +51,25 @@ type LoginIntent struct {
 type LoginData struct {
 	DiscordID int    `bson:"discord_user_id" json:"discord_user_id"`
 	Realm     string `bson:"realm" json:"realm"`
+}
+
+//
+// Payments
+//
+
+// PayPalPaymentIntentData - Data for a payment intent
+type PayPalPaymentIntentData struct {
+	UserID    int
+	SubID     string
+	PlanID    string
+	PatchLink string
+	Status    paypal.SubscriptionStatus
+}
+
+// PayPalPaymentIntent - Intent for a paypal payment
+type PayPalPaymentIntent struct {
+	IntentID   string                  `bson:"_id"`
+	Timestamp  time.Time               `bson:"timestamp"`
+	LastUpdate time.Time               `bson:"last_update"`
+	Data       PayPalPaymentIntentData `bson:"data"`
 }
