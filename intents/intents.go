@@ -7,6 +7,11 @@ import (
 	"github.com/lithammer/shortuuid/v3"
 )
 
+// NewIntentID -
+func NewIntentID() string {
+	return shortuuid.New()
+}
+
 // CreateUserIntent -
 func CreateUserIntent(data db.UserData) (intent db.UserDataIntent, err error) {
 	intent.IntentID = shortuuid.New()

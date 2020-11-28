@@ -74,14 +74,13 @@ func HandleNewSub(ctx *fiber.Ctx) error {
 	var paymentData db.PayPalPaymentIntentData
 	paymentData.UserID = userData.ID
 	paymentData.PlanID = monthlyRegularPlan.PlanID
-	paymentIntent, err := intents.CreatePaymentIntent(paymentData)
 
 	// Create new subscription struct
 	var newSub paypal.SubscriptionBase
 	var appCtx paypal.ApplicationContext
 	newSub.PlanID = monthlyRegularPlan.PlanID
 	// Set redirect URL
-	appCtx.ReturnURL = config.PayPalSuccessRedirectURL + paymentIntent.IntentID
+	appCtx.ReturnURL = config.PayPalSuccessRedirectURL
 	newSub.ApplicationContext = &appCtx
 
 	// Get response
@@ -128,11 +127,11 @@ func HandleNewSub(ctx *fiber.Ctx) error {
 		})
 	}
 
-	// Update intent
-	paymentIntent.Data.PatchLink = patchLink
-	paymentIntent.Data.SubID = subRes.ID
-	paymentIntent.Data.Status = string(subRes.SubscriptionStatus)
-	err = db.UpdatePaymentIntent(paymentIntent)
+	// Create intent
+	paymentData.PatchLink = patchLink
+	paymentData.SubID = subRes.ID
+	paymentData.Status = string(subRes.SubscriptionStatus)
+	_, err = intents.CreatePaymentIntent(paymentData)
 
 	return ctx.JSON(fiber.Map{
 		"payment_link": paymentLink,
