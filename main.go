@@ -7,10 +7,14 @@ import (
 	"github.com/cufee/am-api/paypal"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func main() {
 	app := fiber.New()
+
+	// Logger
+	app.Use(logger.New())
 
 	// WG login routes
 	app.Get("/redirect/:intentID", h.HandleWargamingRedirect)
