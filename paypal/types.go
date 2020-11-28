@@ -1,14 +1,12 @@
 package paypal
 
-import "time"
-
 // WebhookEvent - PayPal Webhool event
 type webhookEvent struct {
-	ID           string    `json:"id"`
-	CreateTime   time.Time `json:"create_time"`
-	ResourceType string    `json:"resource_type"`
-	EventType    string    `json:"event_type"`
-	Summary      string    `json:"summary"`
+	ID           string `json:"id"`
+	CreateTime   string `json:"create_time"`
+	ResourceType string `json:"resource_type"`
+	EventType    string `json:"event_type"`
+	Summary      string `json:"summary"`
 	Resource     struct {
 		Quantity   string `json:"quantity"`
 		Subscriber struct {
@@ -18,13 +16,13 @@ type webhookEvent struct {
 			} `json:"name"`
 			EmailAddress string `json:"email_address"`
 		} `json:"subscriber"`
-		CreateTime     time.Time `json:"create_time"`
+		CreateTime     string `json:"create_time"`
 		ShippingAmount struct {
 			CurrencyCode string `json:"currency_code"`
 			Value        string `json:"value"`
 		} `json:"shipping_amount"`
-		StartTime   time.Time `json:"start_time"`
-		UpdateTime  time.Time `json:"update_time"`
+		StartTime   string `json:"start_time"`
+		UpdateTime  string `json:"update_time"`
 		BillingInfo struct {
 			OutstandingBalance struct {
 				CurrencyCode string `json:"currency_code"`
@@ -42,22 +40,22 @@ type webhookEvent struct {
 					CurrencyCode string `json:"currency_code"`
 					Value        string `json:"value"`
 				} `json:"amount"`
-				Time time.Time `json:"time"`
+				Time string `json:"time"`
 			} `json:"last_payment"`
-			NextBillingTime     time.Time `json:"next_billing_time"`
-			FinalPaymentTime    time.Time `json:"final_payment_time"`
-			FailedPaymentsCount int       `json:"failed_payments_count"`
+			NextBillingTime     string `json:"next_billing_time"`
+			FinalPaymentTime    string `json:"final_payment_time"`
+			FailedPaymentsCount int    `json:"failed_payments_count"`
 		} `json:"billing_info"`
 		Links []struct {
 			Href   string `json:"href"`
 			Rel    string `json:"rel"`
 			Method string `json:"method"`
 		} `json:"links"`
-		ID               string    `json:"id"`
-		PlanID           string    `json:"plan_id"`
-		AutoRenewal      bool      `json:"auto_renewal"`
-		Status           string    `json:"status"`
-		StatusUpdateTime time.Time `json:"status_update_time"`
+		ID               string `json:"id"`
+		PlanID           string `json:"plan_id"`
+		AutoRenewal      bool   `json:"auto_renewal"`
+		Status           string `json:"status"`
+		StatusUpdateTime string `json:"status_update_time"`
 	} `json:"resource"`
 	Links []struct {
 		Href    string `json:"href"`
