@@ -147,6 +147,9 @@ func HandlePaymentEvent(ctx *fiber.Ctx) error {
 	case "BILLING.SUBSCRIPTION.ACTIVATED":
 		subActivated(event)
 
+	case "BILLING.SUBSCRIPTION.RE-ACTIVATED":
+		subActivated(event)
+
 	case "BILLING.SUBSCRIPTION.RENEWED":
 		subActivated(event)
 
@@ -159,9 +162,10 @@ func HandlePaymentEvent(ctx *fiber.Ctx) error {
 	case "BILLING.SUBSCRIPTION.SUSPENDED":
 		subDeactivated(event)
 
-	case "BILLING.SUBSCRIPTION.PAYMENT.FAILED":
-		// subPaymentFaield(event) - No code
-		subDeactivated(event)
+	// No code to handle this properly - might not even need anything here
+	// case "BILLING.SUBSCRIPTION.PAYMENT.FAILED":
+	// 	// subPaymentFaield(event)
+	// 	subDeactivated(event)
 
 	case "BILLING.SUBSCRIPTION.EXPIRED":
 		subDeactivated(event)
