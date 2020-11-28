@@ -135,7 +135,7 @@ func GetPaymentIntent(intentID string) (intent PayPalPaymentIntent, err error) {
 
 // GetPaymentIntentBySubID - Get intent by Subscription ID
 func GetPaymentIntentBySubID(subID string) (intent PayPalPaymentIntent, err error) {
-	err = paymentsCollection.FindOne(ctx, bson.M{"sub_id": subID}).Decode(&intent)
+	err = paymentsCollection.FindOne(ctx, bson.M{"data.sub_id": subID}).Decode(&intent)
 	return intent, err
 }
 
