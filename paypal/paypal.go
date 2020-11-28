@@ -191,7 +191,7 @@ func subActivated(data webhookEvent) {
 	}
 
 	// Parse next renewal date
-	nextPaymentDate, err := time.Parse("2014-10-22T23:48:22Z", data.Resource.BillingInfo.NextBillingTime)
+	nextPaymentDate, err := time.Parse(time.RFC3339, data.Resource.BillingInfo.NextBillingTime)
 	if err != nil {
 		log.Print(fmt.Sprintf("error parsing next billing time for sub_id %s: %s", data.Resource.ID, err.Error()))
 		return
