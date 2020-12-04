@@ -11,6 +11,7 @@ import (
 // UserData -
 type UserData struct {
 	ID                 int       `bson:"_id,omitempty"`
+	Locale             string    `bson:"locale,omitempty"`
 	PremiumExpiration  time.Time `bson:"premium_expiration,omitempty"`
 	HasPremiumSub      bool      `bson:"has_premium_sub,omitempty"`
 	ExcessPremiumMin   int       `bson:"excess_premium_min,omitempty"`
@@ -72,4 +73,24 @@ type PayPalPaymentIntent struct {
 	Timestamp  time.Time               `bson:"timestamp"`
 	LastUpdate time.Time               `bson:"last_update"`
 	Data       PayPalPaymentIntentData `bson:"data"`
+}
+
+//
+// Referrals
+//
+
+// ReferralData - Referal link data
+type ReferralData struct {
+	ID          string          `bson:"_id"`
+	URL         string          `bson:"url"`
+	Description string          `bson:"description"`
+	Title       string          `bson:"title"`
+	Clicks      []ReferralClick `bson:"clicks"`
+}
+
+// ReferralClick - Referral link click
+type ReferralClick struct {
+	URL      string `bson:"url"`
+	UserID   int    `bson:"user_id"`
+	MetaJSON string `bson:"meta_json"`
 }

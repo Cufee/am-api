@@ -10,7 +10,8 @@ import (
 )
 
 type response struct {
-	DefaultPID int `json:"player_id"`
+	DefaultPID int    `json:"player_id"`
+	Locale     string `json:"locale"`
 
 	Premium  bool `json:"premium"`
 	Verified bool `json:"verified"`
@@ -37,6 +38,9 @@ func HandeleUserCheck(c *fiber.Ctx) error {
 		})
 	}
 	var resData response
+
+	// Locale
+	resData.Locale = userData.Locale
 
 	// Get ban data
 	banData, err := db.BanCheck(userData.ID)
@@ -67,8 +71,8 @@ func HandeleUserCheck(c *fiber.Ctx) error {
 	return c.JSON(resData)
 }
 
-// HandelePlayerCheck - Quick user check handler
-func HandelePlayerCheck(c *fiber.Ctx) error {
+// HandelePlayerCheckByID - Quick user check by player id handler
+func HandelePlayerCheckByID(c *fiber.Ctx) error {
 	// Get user data
 	playerID, err := strconv.Atoi(c.Params("playerID"))
 	if err != nil {
@@ -76,36 +80,66 @@ func HandelePlayerCheck(c *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
-	userData, err := db.UserByPlayerID(playerID)
+
+	// Get player profile
+	resData, err := checkByPID(playerID)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-	var resData response
+	return c.JSON(resData)
+}
+
+// HandelePlayerCheckByName - Quick user check by player name handler
+func HandelePlayerCheckByName(c *fiber.Ctx) error {
+	// Get user data
+	c.Params("nickname")
+	// Get ID from regex match to nickname
+	playerID := 0
+
+	// Get player profile
+	resData, err := checkByPID(playerID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(resData)
+}
+
+func checkByPID(pid int) (resData response, err error) {
+	// Get user data
+	userData, err := db.UserByPlayerID(pid)
+	if err != nil {
+		return resData, err
+	}
 
 	// Get ban data
 	banData, err := db.BanCheck(userData.ID)
 	if err != nil && err.Error() != "mongo: no documents in result" {
 		log.Println(err)
 	}
-
 	if banData.UserID == userData.ID {
 		resData.Banned = true
 		resData.BanReason = banData.Reason
 		resData.BanNotified = banData.Notified
 	}
 
+	// Get default pid and premium status
 	resData.DefaultPID = userData.DefaultPID
 	resData.Premium = false
 	if time.Now().Before(userData.PremiumExpiration) {
 		resData.Premium = true
 		resData.CustomBgURL = userData.CustomBgURL
 	}
+
+	// Check verified status
 	resData.Verified = false
 	if time.Now().Before(userData.VerifiedExpiration) {
 		resData.Verified = true
 	}
-	return c.JSON(resData)
+	return resData, err
 }

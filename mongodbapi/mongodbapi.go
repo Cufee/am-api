@@ -3,9 +3,40 @@ package mongodbapi
 import (
 	"time"
 
+	"github.com/cufee/am-api/config"
+	"github.com/lithammer/shortuuid/v3"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+// RecordReferalClick - Record referal link usage
+func RecordReferalClick(refID string, clickData ReferralClick) error {
+	var refData ReferralData
+
+	// Find referral data
+	err := referralsCollection.FindOne(ctx, bson.M{"_id": refID}).Decode(&refData)
+	if err != nil {
+		return err
+	}
+
+	// Record click
+	refData.Clicks = append(refData.Clicks, clickData)
+	_, err = referralsCollection.UpdateOne(ctx, bson.M{"_id": refID}, bson.M{"$set": refData})
+	return err
+}
+
+// GenerateNewReferalCode - Generate new referal code
+func GenerateNewReferalCode(title string, description string) (refData ReferralData, err error) {
+	// Generate referral data
+	refData.ID = shortuuid.New()
+	refData.Description = description
+	refData.Title = title
+	refData.URL = config.ReferralLinkBase + "/" + refData.ID
+
+	// Add referral to DB
+	_, err = referralsCollection.InsertOne(ctx, refData)
+	return refData, err
+}
 
 // UserByDiscordID - Get existing user by discordID
 func UserByDiscordID(did int) (user UserData, err error) {
