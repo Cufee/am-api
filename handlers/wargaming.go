@@ -187,8 +187,11 @@ var clientHTTP = &http.Client{Timeout: 10 * time.Second}
 
 func getRedirectURL(reqURL string) (string, error) {
 	res, err := clientHTTP.Get(reqURL)
-	if err != nil || res.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("status code: %v. error: %s", res.StatusCode, err)
+	if err != nil {
+		return "", err
+	}
+	if res.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("bad response status code: %v", res.StatusCode)
 	}
 	defer res.Body.Close()
 	// Decode response
