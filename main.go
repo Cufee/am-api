@@ -36,8 +36,8 @@ func main() {
 	app.Get("/players/name/:nickname", h.HandelePlayerCheckByName)
 
 	// Backgrounds
-	app.Get("/setnewbg/:discordID", h.HandleSetNewBG)
-	app.Get("/removebg/:discordID", h.HandleRemoveBG)
+	app.Patch("/background/:discordID", h.HandleSetNewBG)
+	app.Delete("/background/:discordID", h.HandleRemoveBG)
 
 	// Premium
 	app.Get("/premium/add", h.HandleNewPremiumIntent)

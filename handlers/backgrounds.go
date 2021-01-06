@@ -65,8 +65,8 @@ func HandleSetNewBG(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{
 			"error": "no image url provided",
 		})
-
 	}
+
 	nsfw, err := isNSFW(newURL)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
