@@ -196,7 +196,7 @@ func uploadToCDN(imageURL string, pid int) (string, error) {
 
 	// Make signature
 	timestamp := strconv.FormatInt(time.Now().UTC().UnixNano(), 10)
-	sigStr := fmt.Sprintf("format=jpg&public_id=%v&timestamp=%s", pid, timestamp) + config.CloudinaryAPISecret
+	sigStr := fmt.Sprintf("format=jpg&public_id=%v&timestamp=%s&upload_preset=400pxAM", pid, timestamp) + config.CloudinaryAPISecret
 
 	// Encode signature
 	h := sha1.New()
@@ -212,7 +212,7 @@ func uploadToCDN(imageURL string, pid int) (string, error) {
 	form.Add("signature", signature)
 	// Resize and change the format
 	form.Add("format", "jpg")
-	form.Add("eager ", "w_400")
+	form.Add("upload_preset", "400pxAM")
 
 	// Send post request
 	req, _ := http.NewRequest("POST", reqURLP, strings.NewReader(form.Encode()))
