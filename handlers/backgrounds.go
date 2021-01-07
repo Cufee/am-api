@@ -212,7 +212,7 @@ func uploadToCDN(imageURL string, pid int) (string, error) {
 	form.Add("signature", signature)
 	// Resize and change the format
 	form.Add("format", "jpg")
-	form.Add("transformations ", "w_400")
+	form.Add("eager ", "w_400")
 
 	// Send post request
 	req, _ := http.NewRequest("POST", reqURLP, strings.NewReader(form.Encode()))
