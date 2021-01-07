@@ -119,8 +119,12 @@ func checkByPID(pid int) (resData response, err error) {
 
 	// Get ban data
 	banData, err := db.BanCheck(userData.ID)
-	if err != nil && err.Error() != "mongo: no documents in result" {
-		log.Println(err)
+	if err != nil {
+		if err.Error() == "mongo: no documents in result" {
+			err = nil
+		} else {
+			log.Println(err)
+		}
 	}
 	if banData.UserID == userData.ID {
 		resData.Banned = true
