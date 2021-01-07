@@ -76,7 +76,7 @@ func HandleSetNewBG(c *fiber.Ctx) error {
 	}
 
 	// Upload image to CDN
-	imgURL, err := uploadToCDN(newURL, userData.VerifiedID)
+	imgURL, err := uploadToCDN(newURL, userData.ID)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
@@ -190,13 +190,13 @@ func isNSFW(imageURL string) (bool, error) {
 	return true, fmt.Errorf("image is NSFW")
 }
 
-func uploadToCDN(imageURL string, pid int) (string, error) {
+func uploadToCDN(imageURL string, userID int) (string, error) {
 	// Make request url
 	reqURLP := config.CloudinaryUploadURL
 
 	// Make signature
 	timestamp := strconv.FormatInt(time.Now().UTC().UnixNano(), 10)
-	sigStr := fmt.Sprintf("format=jpg&public_id=%v&timestamp=%s&upload_preset=400pxAM", pid, timestamp) + config.CloudinaryAPISecret
+	sigStr := fmt.Sprintf("format=jpg&public_id=%v&timestamp=%s&upload_preset=400pxAM", userID, timestamp) + config.CloudinaryAPISecret
 
 	// Encode signature
 	h := sha1.New()
@@ -206,7 +206,7 @@ func uploadToCDN(imageURL string, pid int) (string, error) {
 	// Generate form
 	form := url.Values{}
 	form.Add("timestamp", timestamp)
-	form.Add("public_id", strconv.Itoa(pid))
+	form.Add("public_id", strconv.Itoa(userID))
 	form.Add("api_key", config.CloudinaryAPIKey)
 	form.Add("file", imageURL)
 	form.Add("signature", signature)
