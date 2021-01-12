@@ -57,11 +57,14 @@ func HandeleUserCheck(c *fiber.Ctx) error {
 	resData.DefaultPID = userData.DefaultPID
 
 	// Check premium status
-	resData.Premium = false
-	if time.Now().Before(userData.PremiumExpiration) {
-		resData.Premium = true
-		resData.CustomBgURL = userData.CustomBgURL
-	}
+	// Enabling premium for all members, as the bot is not actively developed
+	resData.Premium = true
+	// resData.Premium = false
+	// if time.Now().Before(userData.PremiumExpiration) {
+	// 	resData.Premium = true
+	// 	resData.CustomBgURL = userData.CustomBgURL
+	// }
+
 	// Check verification status
 	resData.Verified = false
 	if time.Now().Before(userData.VerifiedExpiration) {
