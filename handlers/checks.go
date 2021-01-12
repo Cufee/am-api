@@ -60,6 +60,7 @@ func HandeleUserCheck(c *fiber.Ctx) error {
 	if config.AllUsersPremium {
 		// Check if premium features are enabled for all
 		resData.Premium = true
+		resData.CustomBgURL = userData.CustomBgURL
 	} else {
 		// Check premium status
 		resData.Premium = false
@@ -142,6 +143,7 @@ func checkByPID(pid int) (resData response, err error) {
 	if config.AllUsersPremium {
 		// Check if premium features are enabled for all
 		resData.Premium = true
+		resData.CustomBgURL = userData.CustomBgURL
 	} else {
 		// Check premium status
 		resData.Premium = false
