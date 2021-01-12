@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/cufee/am-api/config"
 	db "github.com/cufee/am-api/mongodbapi"
 	"github.com/gofiber/fiber/v2"
 )
@@ -56,14 +57,17 @@ func HandeleUserCheck(c *fiber.Ctx) error {
 
 	resData.DefaultPID = userData.DefaultPID
 
-	// Check premium status
-	// Enabling premium for all members, as the bot is not actively developed
-	resData.Premium = true
-	// resData.Premium = false
-	// if time.Now().Before(userData.PremiumExpiration) {
-	// 	resData.Premium = true
-	// 	resData.CustomBgURL = userData.CustomBgURL
-	// }
+	if config.AllUsersPremium {
+		// Check if premium features are enabled for all
+		resData.Premium = true
+	} else {
+		// Check premium status
+		resData.Premium = false
+		if time.Now().Before(userData.PremiumExpiration) {
+			resData.Premium = true
+			resData.CustomBgURL = userData.CustomBgURL
+		}
+	}
 
 	// Check verification status
 	resData.Verified = false
@@ -135,12 +139,16 @@ func checkByPID(pid int) (resData response, err error) {
 		resData.BanNotified = banData.Notified
 	}
 
-	// Get default pid and premium status
-	resData.DefaultPID = userData.DefaultPID
-	resData.Premium = false
-	if time.Now().Before(userData.PremiumExpiration) {
+	if config.AllUsersPremium {
+		// Check if premium features are enabled for all
 		resData.Premium = true
-		resData.CustomBgURL = userData.CustomBgURL
+	} else {
+		// Check premium status
+		resData.Premium = false
+		if time.Now().Before(userData.PremiumExpiration) {
+			resData.Premium = true
+			resData.CustomBgURL = userData.CustomBgURL
+		}
 	}
 
 	// Check verified status
