@@ -23,11 +23,11 @@ type UserData struct {
 
 // BanData -
 type BanData struct {
-	UserID     int       `bson:"user_id"`
-	Reason     string    `bson:"reason"`
-	Notified   bool      `bson:"notified"`
-	Timestamp  time.Time `bson:"timestamp"`
-	Expiration time.Time `bson:"expiration"`
+	UserID     int       `bson:"user_id" json:"user_id"`
+	Reason     string    `bson:"reason" json:"reason"`
+	Notified   bool      `bson:"notified" json:"notified"`
+	Timestamp  time.Time `bson:"timestamp" json:"timestamp"`
+	Expiration time.Time `bson:"expiration" json:"expiration"`
 }
 
 // UserDataIntent - Intent to edit User data

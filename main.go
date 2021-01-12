@@ -29,6 +29,9 @@ func main() {
 	app.Get("/users/:discordID", h.HandeleUserCheck) // Will be dropped
 	app.Get("/users/id/:discordID", h.HandeleUserCheck)
 
+	// Bans
+	app.Post("/users/id/:discordID/ban", h.HandleNewBan)
+
 	app.Patch("/users/:discordID/newdef/:playerID", h.HandleNewDefaultPID)
 
 	app.Get("/players/:playerID", h.HandelePlayerCheckByID) // Will be dropped

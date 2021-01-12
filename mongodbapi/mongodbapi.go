@@ -136,7 +136,7 @@ func BanCheck(userID int) (data BanData, err error) {
 // AddBanData - Add new ban entry
 func AddBanData(data BanData) (err error) {
 	// Insert ban object
-	_, err = intentsCollection.InsertOne(ctx, data)
+	_, err = bansCollection.InsertOne(ctx, data)
 	return err
 }
 
