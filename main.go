@@ -28,7 +28,11 @@ func main() {
 	app.Get("/", func(ctx *fiber.Ctx) error { return ctx.Redirect("https://aftermath.link", 301) }) // Root redirect
 
 	// WG redirect
-	app.Get("/redirect/:intentID", h.HandleWargamingRedirect) // Redirect from WG
+	app.Get("/login/r/:intentID", h.HandleWargamingRedirect) // Redirect from WG
+	app.Get("/login/:intentID", h.HandleWargamingLogin)      // Login using intentID
+
+	// Referral redirect
+	app.Get("/r/:refID", h.HandleReferralLink) // Redirect
 
 	// Payments
 	app.Get("/payments/redirect", func(ctx *fiber.Ctx) error { return ctx.Redirect("https://aftermath.link", 301) }) // PayPal redirect
@@ -43,11 +47,9 @@ func main() {
 
 	// Referrals
 	app.Get("/referrals/new", h.HandleNewReferral) // Generate new referral link
-	app.Get("/r/:refID", h.HandleReferralLink)     // Redirect
 
 	// WG login routes
-	app.Get("/newlogin", h.HandleWargamingNewLogin)     // New login intent
-	app.Get("/login/:intentID", h.HandleWargamingLogin) // Login using intentID
+	app.Get("/newlogin", h.HandleWargamingNewLogin) // New login intent
 
 	// Users
 	app.Get("/users/id/:discordID", h.HandeleUserCheck)                    // Check
