@@ -19,6 +19,13 @@ const (
 func Validator(c *fiber.Ctx) error {
 	// Parse api key
 	headerKey := c.Get(DefaultHeaderKeyIdentifier)
+
+	// Check if API key was provided
+	if headerKey == "" {
+		return fiber.ErrBadRequest
+	}
+
+	// Get app data
 	appData, valid := validateKey(headerKey)
 
 	// Check if the key is enabled
@@ -38,11 +45,6 @@ func Validator(c *fiber.Ctx) error {
 
 		// Go to next middleware:
 		return c.Next()
-	}
-
-	// Check if API key was provided
-	if headerKey != "" {
-		return fiber.ErrBadRequest
 	}
 	return fiber.ErrUnauthorized
 }
