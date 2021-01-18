@@ -17,60 +17,46 @@ func main() {
 	// Logger
 	app.Use(logger.New())
 
-	//
-	// Auth disabled
-	//
-
 	// Generate API key - localhost only
 	app.Get("/keys/new", auth.GenerateKey)
 
-	// Root
-	app.Get("/", func(ctx *fiber.Ctx) error { return ctx.Redirect("https://aftermath.link", 301) }) // Root redirect
+	// Auth middleware
+	authRequired := app.Group("", auth.Validator)
 
-	// WG redirect
+	// Referrals
+	authRequired.Get("/referrals/new", h.HandleNewReferral) // Generate new referral link
+	app.Get("/r/:refID", h.HandleReferralLink)              // Redirect
+
+	// WG login routes
+	authRequired.Get("/newlogin", h.HandleWargamingNewLogin) // New login intent
 	app.Get("/login/r/:intentID", h.HandleWargamingRedirect) // Redirect from WG
 	app.Get("/login/:intentID", h.HandleWargamingLogin)      // Login using intentID
 
-	// Referral redirect
-	app.Get("/r/:refID", h.HandleReferralLink) // Redirect
-
-	// Payments
-	app.Get("/payments/redirect", func(ctx *fiber.Ctx) error { return ctx.Redirect("https://aftermath.link", 301) }) // PayPal redirect
-	app.Post("/payments/events", paypal.HandlePaymentEvent)                                                          // PayPal Events
-
-	//
-	// Auth enabled
-	//
-
-	// API key validator
-	app.Use(auth.Validator)
-
-	// Referrals
-	app.Get("/referrals/new", h.HandleNewReferral) // Generate new referral link
-
-	// WG login routes
-	app.Get("/newlogin", h.HandleWargamingNewLogin) // New login intent
-
 	// Users
-	app.Get("/users/id/:discordID", h.HandeleUserCheck)                       // Check
-	app.Post("/users/id/:discordID/ban", h.HandleNewBan)                      // Ban
-	app.Patch("/users/id/:discordID/newdef/:playerID", h.HandleNewDefaultPID) // New default PID
+	authRequired.Get("/users/id/:discordID", h.HandeleUserCheck)                       // Check
+	authRequired.Post("/users/id/:discordID/ban", h.HandleNewBan)                      // Ban
+	authRequired.Patch("/users/id/:discordID/newdef/:playerID", h.HandleNewDefaultPID) // New default PID
 
 	// Players
-	app.Get("/players/id/:playerID", h.HandelePlayerCheckByID)     // Check by ID
-	app.Get("/players/name/:nickname", h.HandelePlayerCheckByName) // Check by name
+	authRequired.Get("/players/id/:playerID", h.HandelePlayerCheckByID)     // Check by ID
+	authRequired.Get("/players/name/:nickname", h.HandelePlayerCheckByName) // Check by name
 
 	// Backgrounds
-	app.Patch("/background/:discordID", h.HandleSetNewBG)  // Set new
-	app.Delete("/background/:discordID", h.HandleRemoveBG) // Delete
+	authRequired.Patch("/background/:discordID", h.HandleSetNewBG)  // Set new
+	authRequired.Delete("/background/:discordID", h.HandleRemoveBG) // Delete
 
 	// Premium
-	app.Get("/premium/add", h.HandleNewPremiumIntent)              // Add premium time
-	app.Get("/premium/newintent", h.HandleNewPremiumIntent)        // Intent for user update
-	app.Get("/premium/redirect/:intentID", h.HandleUpdateRedirect) // Commit using intentID
+	authRequired.Get("/premium/add", h.HandleNewPremiumIntent)              // Add premium time
+	authRequired.Get("/premium/newintent", h.HandleNewPremiumIntent)        // Intent for user update
+	authRequired.Get("/premium/redirect/:intentID", h.HandleUpdateRedirect) // Commit using intentID
 
 	// Payments
-	app.Get("/payments/new/:discordID", paypal.HandleNewSub) // Start new payment intent
+	authRequired.Get("/payments/new/:discordID", paypal.HandleNewSub)                                                // Start new payment intent
+	app.Get("/payments/redirect", func(ctx *fiber.Ctx) error { return ctx.Redirect("https://aftermath.link", 301) }) // PayPal redirect
+	app.Post("/payments/events", paypal.HandlePaymentEvent)
+
+	// Root
+	app.Get("/", func(ctx *fiber.Ctx) error { return ctx.Redirect("https://aftermath.link", 301) }) // Root redirect
 
 	log.Print(app.Listen(":4000"))
 }
