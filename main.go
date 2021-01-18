@@ -17,7 +17,9 @@ func main() {
 	// Logger
 	app.Use(logger.New())
 
+	//
 	// Auth disabled
+	//
 
 	// Generate API key - localhost only
 	app.Get("/keys/new", auth.GenerateKey)
@@ -32,14 +34,16 @@ func main() {
 	app.Get("/payments/redirect", func(ctx *fiber.Ctx) error { return ctx.Redirect("https://aftermath.link", 301) }) // PayPal redirect
 	app.Post("/payments/events", paypal.HandlePaymentEvent)                                                          // PayPal Events
 
+	//
 	// Auth enabled
+	//
 
 	// API key validator
 	app.Use(auth.Validator)
 
 	// Referrals
-	app.Get("/referrals/new", h.HandleNewReferral)
-	app.Get("/referrals/:refID", h.HandleReferralLink)
+	app.Get("/referrals/new", h.HandleNewReferral) // Generate new referral link
+	app.Get("/r/:refID", h.HandleReferralLink)     // Redirect
 
 	// WG login routes
 	app.Get("/newlogin", h.HandleWargamingNewLogin)     // New login intent
@@ -59,12 +63,12 @@ func main() {
 	app.Delete("/background/:discordID", h.HandleRemoveBG) // Delete
 
 	// Premium
-	app.Get("/premium/add", h.HandleNewPremiumIntent)
-	app.Get("/premium/newintent", h.HandleNewPremiumIntent)
-	app.Get("/premium/redirect/:intentID", h.HandleUpdateRedirect)
+	app.Get("/premium/add", h.HandleNewPremiumIntent)              // Add premium time
+	app.Get("/premium/newintent", h.HandleNewPremiumIntent)        // Intent for user update
+	app.Get("/premium/redirect/:intentID", h.HandleUpdateRedirect) // Commit using intentID
 
 	// Payments
-	app.Get("/payments/new/:discordID", paypal.HandleNewSub)
+	app.Get("/payments/new/:discordID", paypal.HandleNewSub) // Start new payment intent
 
 	log.Print(app.Listen(":4000"))
 }
