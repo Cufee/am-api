@@ -40,7 +40,7 @@ func Validator(c *fiber.Ctx) error {
 			}
 
 			// Log request
-			go logEvent(appData, c)
+			go logEvent(appData, *c)
 		}()
 
 		// Go to next middleware:
@@ -80,7 +80,7 @@ func GenerateKey(c *fiber.Ctx) error {
 	}
 
 	// Log request
-	go logEvent(appData, c)
+	go logEvent(appData, *c)
 
 	// Update last used IP
 	go updateAppLastIP(appData.AppID, c.IP())
@@ -116,7 +116,7 @@ func updateAppLastIP(appID primitive.ObjectID, IP string) {
 }
 
 // logEvent - Log access event
-func logEvent(appData appllicationData, c *fiber.Ctx) {
+func logEvent(appData appllicationData, c fiber.Ctx) {
 	// Prepare log data
 	logData, err := appData.prepLogData()
 	if err != nil {
