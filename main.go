@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/cufee/am-api/auth"
 	h "github.com/cufee/am-api/handlers"
 	"github.com/cufee/am-api/paypal"
 
@@ -15,6 +16,12 @@ func main() {
 
 	// Logger
 	app.Use(logger.New())
+
+	// Generate API key
+	app.Get("/keys/new", auth.GenerateKey)
+
+	// API key validator
+	app.Use(auth.Validator)
 
 	// Referrals
 	app.Get("/referrals/new", h.HandleNewReferral)
