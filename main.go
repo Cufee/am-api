@@ -52,9 +52,9 @@ func main() {
 	app.Get("/newlogin", h.HandleWargamingNewLogin) // New login intent
 
 	// Users
-	app.Get("/users/id/:discordID", h.HandeleUserCheck)                    // Check
-	app.Post("/users/id/:discordID/ban", h.HandleNewBan)                   // Ban
-	app.Patch("/users/:discordID/newdef/:playerID", h.HandleNewDefaultPID) // New default PID
+	app.Get("/users/id/:discordID", h.HandeleUserCheck)                       // Check
+	app.Post("/users/id/:discordID/ban", h.HandleNewBan)                      // Ban
+	app.Patch("/users/id/:discordID/newdef/:playerID", h.HandleNewDefaultPID) // New default PID
 
 	// Players
 	app.Get("/players/id/:playerID", h.HandelePlayerCheckByID)     // Check by ID
