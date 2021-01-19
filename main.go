@@ -17,47 +17,43 @@ func main() {
 	// Logger
 	app.Use(logger.New())
 
-	// Auth middleware
-	authDisabled := app.Group("", auth.SkipAuth)
-	authRequired := app.Group("", auth.Validator)
-
 	// Generate API key - localhost only
-	authDisabled.Get("/keys/new", auth.GenerateKey)
+	app.Get("/keys/new", auth.GenerateKey)
 
 	// Referrals
-	authRequired.Get("/referrals/new", h.HandleNewReferral) // Generate new referral link
-	authDisabled.Get("/r/:refID", h.HandleReferralLink)     // Redirect
+	app.Get("/referrals/new", auth.Validator, h.HandleNewReferral) // Generate new referral link
+	app.Get("/r/:refID", h.HandleReferralLink)                     // Redirect
 
 	// WG login routes
-	authRequired.Get("/newlogin", h.HandleWargamingNewLogin)          // New login intent
-	authDisabled.Get("/login/r/:intentID", h.HandleWargamingRedirect) // Redirect from WG
-	authDisabled.Get("/login/:intentID", h.HandleWargamingLogin)      // Login using intentID
+	app.Get("/newlogin", auth.Validator, h.HandleWargamingNewLogin) // New login intent
+	app.Get("/login/r/:intentID", h.HandleWargamingRedirect)        // Redirect from WG
+	app.Get("/login/:intentID", h.HandleWargamingLogin)             // Login using intentID
 
 	// Users
-	authRequired.Get("/users/id/:discordID", h.HandeleUserCheck)                       // Check
-	authRequired.Post("/users/id/:discordID/ban", h.HandleNewBan)                      // Ban
-	authRequired.Patch("/users/id/:discordID/newdef/:playerID", h.HandleNewDefaultPID) // New default PID
+	app.Get("/users/id/:discordID", auth.Validator, h.HandeleUserCheck)                       // Check
+	app.Post("/users/id/:discordID/ban", auth.Validator, h.HandleNewBan)                      // Ban
+	app.Patch("/users/id/:discordID/newdef/:playerID", auth.Validator, h.HandleNewDefaultPID) // New default PID
 
 	// Players
-	authRequired.Get("/players/id/:playerID", h.HandelePlayerCheckByID)     // Check by ID
-	authRequired.Get("/players/name/:nickname", h.HandelePlayerCheckByName) // Check by name
+	app.Get("/players/id/:playerID", auth.Validator, h.HandelePlayerCheckByID)     // Check by ID
+	app.Get("/players/name/:nickname", auth.Validator, h.HandelePlayerCheckByName) // Check by name
 
 	// Backgrounds
-	authRequired.Patch("/background/:discordID", h.HandleSetNewBG)  // Set new
-	authRequired.Delete("/background/:discordID", h.HandleRemoveBG) // Delete
+	app.Patch("/background/:discordID", auth.Validator, h.HandleSetNewBG)  // Set new
+	app.Delete("/background/:discordID", auth.Validator, h.HandleRemoveBG) // Delete
 
 	// Premium
-	authRequired.Get("/premium/add", h.HandleNewPremiumIntent)              // Add premium time
-	authRequired.Get("/premium/newintent", h.HandleNewPremiumIntent)        // Intent for user update
-	authRequired.Get("/premium/redirect/:intentID", h.HandleUpdateRedirect) // Commit using intentID
+	app.Get("/premium/add", auth.Validator, h.HandleNewPremiumIntent)              // Add premium time
+	app.Get("/premium/newintent", auth.Validator, h.HandleNewPremiumIntent)        // Intent for user update
+	app.Get("/premium/redirect/:intentID", auth.Validator, h.HandleUpdateRedirect) // Commit using intentID
 
 	// Payments
-	authRequired.Get("/payments/new/:discordID", paypal.HandleNewSub)                                                         // Start new payment intent
-	authDisabled.Get("/payments/redirect", func(ctx *fiber.Ctx) error { return ctx.Redirect("https://aftermath.link", 301) }) // PayPal redirect
-	authDisabled.Post("/payments/events", paypal.HandlePaymentEvent)
+	app.Get("/payments/new/:discordID", paypal.HandleNewSub)                                                         // Start new payment intent
+	app.Get("/payments/redirect", func(ctx *fiber.Ctx) error { return ctx.Redirect("https://aftermath.link", 301) }) // PayPal redirect
+	app.Post("/payments/events", paypal.HandlePaymentEvent)
 
 	// Root
-	authDisabled.Get("/", func(ctx *fiber.Ctx) error { return ctx.Redirect("https://aftermath.link", 301) }) // Root redirect
+	app.Get("/", func(ctx *fiber.Ctx) error { return ctx.Redirect("https://aftermath.link", 301) }) // Root redirect
 
 	log.Print(app.Listen(":4000"))
 }

@@ -15,21 +15,9 @@ const (
 	DefaultHeaderKeyIdentifier string = "x-api-key"
 )
 
-// SkipAuth - Remove auth handler from stack
+// SkipAuth -
 func SkipAuth(c *fiber.Ctx) error {
-	// Make a new handler slice
-	newHandlers := []func(*fiber.Ctx) error{}
-
-	// Apend other handlers
-	ValidatorPointer := Validator
-	for _, h := range c.Route().Handlers {
-		if &ValidatorPointer != &h {
-			newHandlers = append(newHandlers, h)
-		}
-	}
-
-	// Replace original handler slice
-	c.Route().Handlers = newHandlers
+	c.Append("x-api-key", "e88c2ef5-561a-4d96-aa05-7682583e5e16")
 	return c.Next()
 }
 
