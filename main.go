@@ -17,12 +17,12 @@ func main() {
 	// Logger
 	app.Use(logger.New())
 
-	// Generate API key - localhost only
-	app.Get("/keys/new", auth.GenerateKey)
-
 	// Auth middleware
-	authDisabled := app.Group("")
+	authDisabled := app.Group("", auth.SkipAuth)
 	authRequired := app.Group("", auth.Validator)
+
+	// Generate API key - localhost only
+	authDisabled.Get("/keys/new", auth.GenerateKey)
 
 	// Referrals
 	authRequired.Get("/referrals/new", h.HandleNewReferral) // Generate new referral link
