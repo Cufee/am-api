@@ -15,12 +15,6 @@ const (
 	DefaultHeaderKeyIdentifier string = "x-api-key"
 )
 
-// SkipAuth -
-func SkipAuth(c *fiber.Ctx) error {
-	c.Append("x-api-key", "e88c2ef5-561a-4d96-aa05-7682583e5e16")
-	return c.Next()
-}
-
 // Validator - Validate API key passed in header
 func Validator(c *fiber.Ctx) error {
 	// Parse api key
