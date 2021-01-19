@@ -32,7 +32,7 @@ func Validator(c *fiber.Ctx) error {
 	if valid {
 		defer func() {
 			// Generate IP warning
-			if appData.LastIP != c.IP() {
+			if c.IP() != "0.0.0.0" && appData.LastIP != c.IP() {
 				log.Print(fmt.Sprintf("Application %s changed IP address from %s to %s", appData.AppName, appData.LastIP, c.IP()))
 
 				// Update last used IP
@@ -128,6 +128,7 @@ func logEvent(appData appllicationData, c fiber.Ctx) {
 	logData.RequestIP = c.IP()
 	logData.RequestPath = c.Path()
 	logData.RequestTime = time.Now()
+	logData.RequestMethod = c.Method()
 
 	err = addLogEntry(logData)
 	if err != nil {

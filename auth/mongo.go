@@ -27,11 +27,12 @@ type appllicationData struct {
 
 // Application log entry
 type appLogEntry struct {
-	AppID       primitive.ObjectID `bson:"app_id"`
-	AppName     string             `bson:"app_name"`
-	RequestIP   string             `bson:"request_ip"`
-	RequestPath string             `bson:"request_path"`
-	RequestTime time.Time          `bson:"request_time"`
+	AppID         primitive.ObjectID `bson:"app_id"`
+	AppName       string             `bson:"app_name"`
+	RequestIP     string             `bson:"request_ip"`
+	RequestPath   string             `bson:"request_path"`
+	RequestTime   time.Time          `bson:"request_time"`
+	RequestMethod string             `bson:"request_method"`
 }
 
 func (appData appllicationData) prepLogData() (logData appLogEntry, err error) {
