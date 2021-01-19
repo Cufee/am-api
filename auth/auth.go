@@ -46,6 +46,7 @@ func Validator(c *fiber.Ctx) error {
 		// Go to next middleware:
 		return c.Next()
 	}
+	log.Printf("Key: %s | Valid: %v", headerKey, valid)
 	return fiber.ErrUnauthorized
 }
 
