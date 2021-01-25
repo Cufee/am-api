@@ -124,6 +124,16 @@ func GetBanData(userID int, days int) (data BanData, err error) {
 	return data, err
 }
 
+// GetBansCount - Get existing ban data
+func GetBansCount(userID int, days int) (bans int, err error) {
+	// Make a filter by user id and ban timestamp
+	timestamp := time.Now().Add(time.Duration(-days) * 24 * time.Hour)
+	filter := bson.M{"user_id": userID, "timestamp": bson.M{"$gt": timestamp}}
+
+	cur, err := bansCollection.Find(ctx, filter)
+	return cur.RemainingBatchLength(), err
+}
+
 // BanCheck - Check if a user is banned
 func BanCheck(userID int) (data BanData, err error) {
 	// Make a filter by user id and ban expiration
