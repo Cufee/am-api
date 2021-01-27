@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -13,6 +12,7 @@ import (
 	"github.com/cufee/am-api/config"
 	"github.com/cufee/am-api/intents"
 	db "github.com/cufee/am-api/mongodbapi"
+	"github.com/cufee/am-api/wargaming"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -186,17 +186,8 @@ type redirectRes struct {
 var clientHTTP = &http.Client{Timeout: 10 * time.Second}
 
 func getRedirectURL(reqURL string) (string, error) {
-	res, err := clientHTTP.Get(reqURL)
-	if err != nil {
-		return "", err
-	}
-	if res.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("bad response status code: %v", res.StatusCode)
-	}
-	defer res.Body.Close()
-	// Decode response
 	var resData redirectRes
-	err = json.NewDecoder(res.Body).Decode(&resData)
+	err := wargaming.GetLimited(reqURL, &resData)
 	if err != nil {
 		return "", err
 	}
