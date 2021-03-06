@@ -46,7 +46,10 @@ func UserByDiscordID(did int) (user UserData, err error) {
 
 // UserByPlayerID - Get existing user by playerID
 func UserByPlayerID(pid int) (user UserData, err error) {
-	err = userDataCollection.FindOne(ctx, bson.M{"verified_id": pid}).Decode(&user)
+	var opts options.FindOneOptions
+	opts.SetSort(bson.M{"verified_expiration": -1})
+
+	err = userDataCollection.FindOne(ctx, bson.M{"verified_id": pid}, &opts).Decode(&user)
 	return user, err
 }
 
