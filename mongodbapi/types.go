@@ -10,15 +10,15 @@ import (
 
 // UserData -
 type UserData struct {
-	ID                 int       `bson:"_id,omitempty"`
-	Locale             string    `bson:"locale,omitempty"`
-	PremiumExpiration  time.Time `bson:"premium_expiration,omitempty"`
-	HasPremiumSub      bool      `bson:"has_premium_sub,omitempty"`
-	ExcessPremiumMin   int       `bson:"excess_premium_min,omitempty"`
-	VerifiedExpiration time.Time `bson:"verified_expiration,omitempty"`
-	VerifiedID         int       `bson:"verified_id,omitempty"`
-	DefaultPID         int       `bson:"default_player_id,omitempty"`
-	CustomBgURL        string    `bson:"custom_bg,omitempty"`
+	ID                 int       `bson:"_id"`
+	Locale             string    `bson:"locale"`
+	PremiumExpiration  time.Time `bson:"premium_expiration"`
+	HasPremiumSub      bool      `bson:"has_premium_sub"`
+	ExcessPremiumMin   int       `bson:"excess_premium_min"`
+	VerifiedExpiration time.Time `bson:"verified_expiration"`
+	VerifiedID         int       `bson:"verified_id"`
+	DefaultPID         int       `bson:"default_player_id"`
+	CustomBgURL        string    `bson:"custom_bg"`
 }
 
 // BanData -
