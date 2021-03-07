@@ -118,6 +118,32 @@ func HandelePlayerCheckByName(c *fiber.Ctx) error {
 	return c.JSON(resData)
 }
 
+// HandlePublicPlayerCheckByName - Quick user check by player name handler
+func HandlePublicPlayerCheckByName(c *fiber.Ctx) error {
+	// Get ID from name
+	playerID, err := db.PlayerIDbyName(c.Params("nickname"))
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	// Get player profile
+	resData, err := checkByPID(playerID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	var publicRes response
+	publicRes.DefaultPID = resData.DefaultPID
+
+	log.Print(publicRes, resData)
+
+	return c.JSON(publicRes)
+}
+
 func checkByPID(pid int) (resData response, err error) {
 	// Get user data
 	userData, err := db.UserByPlayerID(pid)

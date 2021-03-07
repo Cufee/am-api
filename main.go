@@ -8,6 +8,7 @@ import (
 	"github.com/cufee/am-api/paypal"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
@@ -16,6 +17,14 @@ func main() {
 
 	// Logger
 	app.Use(logger.New())
+	// CORS
+	app.Use(cors.New())
+	app.Use(cors.New(cors.Config{
+		AllowHeaders: "Origin, Content-Type, Accept",
+	}))
+
+	// Public endpoints
+	app.Get("/public/players/name/:nickname", h.HandlePublicPlayerCheckByName) // Check by name - Public
 
 	// Generate API key - localhost only
 	app.Get("/keys/new", auth.GenerateKey)

@@ -12,10 +12,11 @@ import (
 )
 
 // Collections
-var userDataCollection *mongo.Collection
+var bansCollection *mongo.Collection
+var playersCollection *mongo.Collection
 var intentsCollection *mongo.Collection
 var paymentsCollection *mongo.Collection
-var bansCollection *mongo.Collection
+var userDataCollection *mongo.Collection
 var referralsCollection *mongo.Collection
 var ctx = context.TODO()
 
@@ -37,9 +38,10 @@ func init() {
 	log.Println("Successfully connected and pinged.")
 
 	// Collections
+	bansCollection = client.Database("webapp").Collection("bans")
+	playersCollection = client.Database("stats").Collection("players")
 	userDataCollection = client.Database("webapp").Collection("users")
 	intentsCollection = client.Database("webapp").Collection("intents")
 	paymentsCollection = client.Database("webapp").Collection("payments")
-	bansCollection = client.Database("webapp").Collection("bans")
 	referralsCollection = client.Database("webapp").Collection("referrals")
 }

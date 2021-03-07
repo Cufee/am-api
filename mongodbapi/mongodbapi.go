@@ -1,6 +1,7 @@
 package mongodbapi
 
 import (
+	"reflect"
 	"time"
 
 	"github.com/cufee/am-api/config"
@@ -36,6 +37,15 @@ func GenerateNewReferalCode(title string, description string) (refData ReferralD
 	// Add referral to DB
 	_, err = referralsCollection.InsertOne(ctx, refData)
 	return refData, err
+}
+
+// PlayerIDbyName - Get playerId from nickname
+func PlayerIDbyName(name string) (pidInt int, err error) {
+	pid, err := playersCollection.Distinct(ctx, "_id", bson.M{"nickname": bson.M{"$regex": name, "$options": "i"}})
+	if reflect.TypeOf(pid) == reflect.TypeOf(int32(1)) {
+		pidInt = int(pid[0].(int32))
+	}
+	return pidInt, err
 }
 
 // UserByDiscordID - Get existing user by discordID
