@@ -128,18 +128,8 @@ func HandlePublicPlayerCheckByName(c *fiber.Ctx) error {
 		})
 	}
 
-	// Get player profile
-	resData, err := checkByPID(playerID)
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
 	var publicRes response
-	publicRes.DefaultPID = resData.DefaultPID
-
-	log.Print(publicRes, resData)
+	publicRes.DefaultPID = playerID
 
 	return c.JSON(publicRes)
 }
