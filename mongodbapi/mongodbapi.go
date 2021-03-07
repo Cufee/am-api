@@ -43,6 +43,9 @@ func GenerateNewReferalCode(title string, description string) (refData ReferralD
 // PlayerIDbyName - Get playerId from nickname
 func PlayerIDbyName(name string) (pidInt int, err error) {
 	pids, err := playersCollection.Distinct(ctx, "_id", bson.M{"nickname": bson.M{"$regex": name, "$options": "i"}})
+	if err != nil {
+		return pidInt, err
+	}
 	if reflect.TypeOf(pids[0]) == reflect.TypeOf(int32(1)) {
 		pidInt = int(pids[0].(int32))
 	} else {
