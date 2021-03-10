@@ -30,17 +30,18 @@ func Validator(c *fiber.Ctx) error {
 
 	// Check if the key is enabled
 	if valid {
+		contextCache := *c
 		defer func() {
 			// Generate IP warning
-			if c.IP() != "0.0.0.0" && appData.LastIP != c.IP() {
-				log.Print(fmt.Sprintf("Application %s changed IP address from %s to %s", appData.AppName, appData.LastIP, c.IP()))
+			if contextCache.IP() != "0.0.0.0" && appData.LastIP != contextCache.IP() {
+				log.Print(fmt.Sprintf("Application %s changed IP address from %s to %s", appData.AppName, appData.LastIP, contextCache.IP()))
 
 				// Update last used IP
-				go updateAppLastIP(appData.AppID, c.IP())
+				go updateAppLastIP(appData.AppID, contextCache.IP())
 			}
 
 			// Log request
-			go logEvent(appData, *c)
+			go logEvent(appData, contextCache)
 		}()
 
 		// Go to next middleware:
