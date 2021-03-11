@@ -16,6 +16,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// StatsRequest - Request for stats
+type StatsRequest struct {
+	PlayerID int    `json:"player_id"`
+	Realm    string `json:"realm"`
+}
+
 // HandleWargamingRedirect -
 func HandleWargamingRedirect(c *fiber.Ctx) error {
 	// Check reponse
@@ -75,6 +81,18 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 		err = nil
 	}
 
+	// Check if player is in db
+	if !db.PlayerExistsByID(accID) {
+		// Add player to DB
+		err = db.AddPlayerToDB(accID, intent.Realm)
+		if err != nil {
+			log.Print(err.Error())
+			return c.Status(500).JSON(fiber.Map{
+				"error": fmt.Sprintf("failed to add a new player to db: %v", err.Error()),
+			})
+		}
+	}
+
 	// Add/Update DB record
 	err = db.UpdateUser(intent.Data, true)
 	if err != nil {
@@ -108,7 +126,7 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 	}
 
 	// Create edit intent
-	newIntent, err := intents.CreateUserIntent(userData)
+	newIntent, err := intents.CreateUserIntent(userData, intentData.Realm)
 	if err != nil {
 		log.Print(err.Error())
 		return c.Status(500).JSON(fiber.Map{
@@ -151,6 +169,7 @@ func HandleWargamingNewLogin(c *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
+
 	// Return intentID
 	return c.JSON(fiber.Map{
 		"intent_id":   intentID,

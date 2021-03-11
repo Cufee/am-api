@@ -55,7 +55,7 @@ func HandleNewPremiumIntent(c *fiber.Ctx) error {
 	var intent db.UserDataIntent
 	intent.Data = userData
 
-	intentID, err := intents.CreateUserIntent(intent.Data)
+	intentID, err := intents.CreateUserIntent(intent.Data, "")
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),

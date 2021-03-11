@@ -54,6 +54,24 @@ func PlayerIDbyName(name string) (pidInt int, err error) {
 	return pidInt, err
 }
 
+// PlayerExistsByID - Check if a player exists by ID
+func PlayerExistsByID(pid int) bool {
+	cur, err := playersCollection.Distinct(ctx, "_id", bson.M{"_id": pid})
+	if err != nil || len(cur) == 0 {
+		return false
+	}
+	return true
+}
+
+// AddPlayerToDB - Add player to DB
+func AddPlayerToDB(pid int, realm string) error {
+	var player DBPlayerPofile
+	player.ID = pid
+	player.Realm = realm
+	_, err := playersCollection.InsertOne(ctx, player)
+	return err
+}
+
 // UserByDiscordID - Get existing user by discordID
 func UserByDiscordID(did int) (user UserData, err error) {
 	err = userDataCollection.FindOne(ctx, bson.M{"_id": did}).Decode(&user)

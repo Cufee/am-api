@@ -13,9 +13,10 @@ func NewIntentID() string {
 }
 
 // CreateUserIntent -
-func CreateUserIntent(data db.UserData) (intent db.UserDataIntent, err error) {
+func CreateUserIntent(data db.UserData, realm string) (intent db.UserDataIntent, err error) {
 	intent.IntentID = shortuuid.New()
 	intent.Timestamp = time.Now()
+	intent.Realm = realm
 	intent.Data = data
 	return intent, db.NewUserIntent(intent)
 }
