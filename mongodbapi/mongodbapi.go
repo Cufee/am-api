@@ -2,7 +2,7 @@ package mongodbapi
 
 import (
 	"fmt"
-	"reflect"
+	"strings"
 	"time"
 
 	"github.com/cufee/am-api/config"
@@ -40,18 +40,17 @@ func GenerateNewReferalCode(title string, description string) (refData ReferralD
 	return refData, err
 }
 
-// PlayerIDbyName - Get playerId from nickname
-func PlayerIDbyName(name string) (pidInt int, err error) {
-	pids, err := playersCollection.Distinct(ctx, "_id", bson.M{"nickname": bson.M{"$regex": name, "$options": "i"}})
+// PlayerIDbyNameAndRealm - Get playerId from nickname
+func PlayerIDbyNameAndRealm(name string, realm string) (pidInt int, err error) {
+	name = fmt.Sprintf("^%v$", name)
+	realm = strings.ToUpper(realm)
+
+	var player DBPlayerPofile
+	err = playersCollection.FindOne(ctx, bson.M{"nickname": bson.M{"$regex": name, "$options": "i"}, "realm": realm}).Decode(&player)
 	if err != nil {
-		return pidInt, err
+		return pidInt, fmt.Errorf("player not found, make sure this account is tracked by Aftermath")
 	}
-	if len(pids) > 0 && reflect.TypeOf(pids[0]) == reflect.TypeOf(int32(1)) {
-		pidInt = int(pids[0].(int32))
-	} else {
-		err = fmt.Errorf("player not found, make sure this account is tracked by Aftermath")
-	}
-	return pidInt, err
+	return player.ID, err
 }
 
 // PlayerExistsByID - Check if a player exists by ID

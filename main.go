@@ -24,7 +24,7 @@ func main() {
 	}))
 
 	// Public endpoints
-	app.Get("/public/players/name/:nickname", h.HandlePublicPlayerCheckByName) // Check by name - Public
+	app.Get("/public/:realm/players/name/:nickname", h.HandlePublicPlayerCheckByName) // Check by name - Public
 
 	// Generate API key - localhost only
 	app.Get("/keys/new", auth.GenerateKey)

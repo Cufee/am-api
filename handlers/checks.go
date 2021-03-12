@@ -121,7 +121,7 @@ func HandelePlayerCheckByName(c *fiber.Ctx) error {
 // HandlePublicPlayerCheckByName - Quick user check by player name handler
 func HandlePublicPlayerCheckByName(c *fiber.Ctx) error {
 	// Get ID from name
-	playerID, err := db.PlayerIDbyName(c.Params("nickname"))
+	playerID, err := db.PlayerIDbyNameAndRealm(c.Params("nickname"), c.Params("realm"))
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
