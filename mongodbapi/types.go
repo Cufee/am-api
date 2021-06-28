@@ -18,6 +18,7 @@ type UserData struct {
 	VerifiedExpiration time.Time `bson:"verified_expiration"`
 	VerifiedID         int       `bson:"verified_id"`
 	DefaultPID         int       `bson:"default_player_id"`
+	AccessToken        string    `bson:"access_token"`
 	CustomBgURL        string    `bson:"custom_bg"`
 }
 

@@ -47,6 +47,11 @@ func HandleNewReferral(c *fiber.Ctx) error {
 
 	// Generate new referral
 	refData, err := mongodbapi.GenerateNewReferalCode(reqData.Title, reqData.Description)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": fmt.Sprintf("bad json body: %s", err.Error()),
+		})
+	}
 
 	return c.JSON(fiber.Map{
 		"url": refData.URL,

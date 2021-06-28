@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -68,6 +67,7 @@ func HandleWargamingRedirect(c *fiber.Ctx) error {
 	intent.Data.VerifiedID = accID
 	intent.Data.VerifiedExpiration = time.Unix(i, 0)
 	intent.Data.DefaultPID = accID
+	intent.Data.AccessToken = c.Query("access_token")
 
 	// Clear any existing logins for this accID
 	err = db.RemoveOldLogins(accID)
@@ -193,17 +193,13 @@ func wgAPIurl(realm string, intentID string) (string, error) {
 	return "", errors.New("bad realm")
 }
 
-// Wargaming API Redirect URL
-
 type redirectRes struct {
 	Data struct {
 		Location string `json:"location"`
 	} `json:"data"`
 }
 
-// HTTP client
-var clientHTTP = &http.Client{Timeout: 10 * time.Second}
-
+// Wargaming API Redirect URL
 func getRedirectURL(reqURL string) (string, error) {
 	var resData redirectRes
 	err := wargaming.GetLimited(reqURL, &resData)

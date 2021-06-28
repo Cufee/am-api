@@ -43,9 +43,14 @@ func HandleNewBan(c *fiber.Ctx) error {
 
 	// Check 24 hour bans
 	bans, err := mongodbapi.GetBansCount(discordID, 7)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
 	if bans > 1 {
 		// Increase ban duration
-		banDuration := banData.Expiration.Sub(time.Now())
+		banDuration := time.Until(banData.Expiration)
 		banData.Expiration = time.Now().Add(time.Duration(bans) * banDuration)
 	}
 

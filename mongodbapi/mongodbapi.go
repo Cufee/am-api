@@ -124,7 +124,6 @@ func RemoveOldLogins(pid int) error {
 // DeleteIntent - Add new intent to DB
 func DeleteIntent(intentID string) {
 	intentsCollection.DeleteOne(ctx, bson.M{"_id": intentID})
-	return
 }
 
 // NewUserIntent - Add new intent to DB
