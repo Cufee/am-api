@@ -184,7 +184,7 @@ func isNSFW(imageURL string) (bool, error) {
 	}
 
 	// Image is safe or work
-	if data.Output.NsfwScore < 0.7 {
+	if data.Output.NsfwScore < 0.5 {
 		return false, nil
 	}
 	return true, fmt.Errorf("image is NSFW")
