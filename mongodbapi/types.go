@@ -20,6 +20,9 @@ type UserData struct {
 	DefaultPID         int       `bson:"default_player_id"`
 	AccessToken        string    `bson:"access_token"`
 	CustomBgURL        string    `bson:"custom_bg"`
+
+	ShadowBanned    bool   `json:"shadow_banned"`
+	ShadowBanReason string `json:"shadow_ban_reason"`
 }
 
 // BanData -

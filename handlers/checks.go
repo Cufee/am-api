@@ -19,9 +19,10 @@ type response struct {
 
 	CustomBgURL string `json:"bg_url"`
 
-	Banned      bool   `json:"banned"`
-	BanReason   string `json:"ban_reason,omitempty"`
-	BanNotified bool   `json:"ban_notified,omitempty"`
+	Banned       bool   `json:"banned"`
+	BanReason    string `json:"ban_reason,omitempty"`
+	BanNotified  bool   `json:"ban_notified,omitempty"`
+	ShadowBanned bool   `json:"shadow_banned,omitempty"`
 }
 
 // HandeleUserCheck - Quick user check handler
@@ -42,6 +43,9 @@ func HandeleUserCheck(c *fiber.Ctx) error {
 
 	// Locale
 	resData.Locale = userData.Locale
+
+	// Shadow ban
+	resData.ShadowBanned = userData.ShadowBanned
 
 	// Get ban data
 	banData, err := db.BanCheck(userData.ID)
@@ -140,6 +144,9 @@ func checkByPID(pid int) (resData response, err error) {
 	if err != nil {
 		return resData, err
 	}
+
+	// Shadow ban
+	resData.ShadowBanned = userData.ShadowBanned
 
 	// Get ban data
 	banData, err := db.BanCheck(userData.ID)
