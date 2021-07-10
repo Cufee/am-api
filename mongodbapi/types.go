@@ -21,8 +21,8 @@ type UserData struct {
 	AccessToken        string    `bson:"access_token"`
 	CustomBgURL        string    `bson:"custom_bg"`
 
-	ShadowBanned    bool   `json:"shadow_banned"`
-	ShadowBanReason string `json:"shadow_ban_reason"`
+	ShadowBanned    bool   `bson:"shadow_banned"`
+	ShadowBanReason string `bson:"shadow_ban_reason"`
 }
 
 // BanData -
