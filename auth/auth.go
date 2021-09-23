@@ -30,7 +30,7 @@ func Validator(c *fiber.Ctx) error {
 
 	// Check if the key is enabled
 	if valid {
-		contextCache := *c
+		contextCache := (*c)
 		defer func() {
 			// Generate IP warning
 			if contextCache.IP() != "0.0.0.0" && appData.LastIP != contextCache.IP() {
@@ -119,6 +119,11 @@ func updateAppLastIP(appID primitive.ObjectID, IP string) {
 
 // logEvent - Log access event
 func logEvent(appData appllicationData, c fiber.Ctx) {
+	if c.IP == nil || c.Path == nil || c.Method == nil {
+		log.Printf("bad session pointer")
+		return
+	}
+
 	// Prepare log data
 	logData, err := appData.prepLogData()
 	if err != nil {
