@@ -176,6 +176,10 @@ func checkByPID(pid int) (resData response, err error) {
 		}
 	}
 
+	// Misc
+	resData.Locale = userData.Locale
+	resData.DefaultPID = userData.DefaultPID
+
 	// Check verified status
 	resData.Verified = false
 	if time.Now().Before(userData.VerifiedExpiration) {
