@@ -30,18 +30,17 @@ func Validator(c *fiber.Ctx) error {
 
 	// Check if the key is enabled
 	if valid {
-		contextCache := (*c)
 		defer func() {
 			// Generate IP warning
-			if contextCache.IP() != "0.0.0.0" && appData.LastIP != contextCache.IP() {
-				log.Print(fmt.Sprintf("Application %s changed IP address from %s to %s", appData.AppName, appData.LastIP, contextCache.IP()))
+			if c != nil && c.IP() != "0.0.0.0" && appData.LastIP != c.IP() {
+				log.Print(fmt.Sprintf("Application %s changed IP address from %s to %s", appData.AppName, appData.LastIP, c.IP()))
 
 				// Update last used IP
-				go updateAppLastIP(appData.AppID, contextCache.IP())
+				go updateAppLastIP(appData.AppID, c.IP())
 			}
 
 			// Log request
-			go logEvent(appData, contextCache)
+			go logEvent(appData, c)
 		}()
 
 		// Go to next middleware:
@@ -82,7 +81,7 @@ func GenerateKey(c *fiber.Ctx) error {
 	}
 
 	// Log request
-	go logEvent(appData, *c)
+	go logEvent(appData, c)
 
 	// Update last used IP
 	go updateAppLastIP(appData.AppID, c.IP())
@@ -118,8 +117,14 @@ func updateAppLastIP(appID primitive.ObjectID, IP string) {
 }
 
 // logEvent - Log access event
-func logEvent(appData appllicationData, c fiber.Ctx) {
-	if c.IP == nil || c.Path == nil || c.Method == nil {
+func logEvent(appData appllicationData, c *fiber.Ctx) {
+	defer func() {
+		if r := recover(); r != nil { // Catch panic
+			log.Print(fmt.Errorf("logEvent: %s", r))
+		}
+	}()
+
+	if c == nil || c.IP() == "" || c.Path() == "" || c.Method() == "" {
 		log.Printf("bad session pointer")
 		return
 	}

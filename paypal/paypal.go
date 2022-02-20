@@ -3,7 +3,6 @@ package paypal
 import (
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -16,28 +15,29 @@ import (
 )
 
 func makePayPalClient(debug bool) (pc *paypal.Client, err error) {
-	// Load cliendID and secretID
-	clientID, err := loadToken("paypal/auth/client_id.dat")
-	if err != nil {
-		return nil, err
-	}
+	// // Load cliendID and secretID
+	// clientID, err := loadToken("paypal/auth/client_id.dat")
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	secretID, err := loadToken("paypal/auth/secret.dat")
-	if err != nil {
-		return nil, err
-	}
+	// secretID, err := loadToken("paypal/auth/secret.dat")
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// Create a client instance
-	pc, err = paypal.NewClient(clientID, secretID, paypal.APIBaseLive)
-	if err != nil {
-		return nil, err
-	}
-	if debug {
-		pc.SetLog(os.Stdout) // Set log to terminal stdout
-	}
+	// pc, err = paypal.NewClient(clientID, secretID, paypal.APIBaseLive)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// if debug {
+	// 	pc.SetLog(os.Stdout) // Set log to terminal stdout
+	// }
 
-	_, err = pc.GetAccessToken()
-	return pc, err
+	// _, err = pc.GetAccessToken()
+	// return pc, err
+	return nil, nil
 }
 
 // HandleNewSub - Handle new subscription request
