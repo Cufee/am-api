@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 const (
@@ -26,23 +24,10 @@ func Validator(c *fiber.Ctx) error {
 	}
 
 	// Get app data
-	appData, valid := validateKey(headerKey)
+	_, valid := validateKey(headerKey)
 
 	// Check if the key is enabled
 	if valid {
-		defer func() {
-			// Generate IP warning
-			if c != nil && c.IP() != "0.0.0.0" && appData.LastIP != c.IP() {
-				log.Print(fmt.Sprintf("Application %s changed IP address from %s to %s", appData.AppName, appData.LastIP, c.IP()))
-
-				// Update last used IP
-				go updateAppLastIP(appData.AppID, c.IP())
-			}
-
-			// Log request
-			go logEvent(appData, c)
-		}()
-
 		// Go to next middleware:
 		return c.Next()
 	}
@@ -80,12 +65,6 @@ func GenerateKey(c *fiber.Ctx) error {
 		})
 	}
 
-	// Log request
-	go logEvent(appData, c)
-
-	// Update last used IP
-	go updateAppLastIP(appData.AppID, c.IP())
-
 	return c.SendStatus(fiber.StatusOK)
 }
 
@@ -101,49 +80,4 @@ func validateKey(key string) (appData appllicationData, valid bool) {
 
 	// Return
 	return appData, appData.Enabled
-}
-
-// updateAppLastIP - Update last IP used for app
-func updateAppLastIP(appID primitive.ObjectID, IP string) {
-	var appData appllicationData
-	appData.AppID = appID
-	appData.LastIP = IP
-	appData.LastUsed = time.Now()
-
-	err := updateAppData(appData)
-	if err != nil {
-		log.Print(fmt.Errorf("updateAppData: %s", err.Error()))
-	}
-}
-
-// logEvent - Log access event
-func logEvent(appData appllicationData, c *fiber.Ctx) {
-	defer func() {
-		if r := recover(); r != nil { // Catch panic
-			log.Print(fmt.Errorf("logEvent: %s", r))
-		}
-	}()
-
-	if c == nil || c.IP() == "" || c.Path() == "" || c.Method() == "" {
-		log.Printf("bad session pointer")
-		return
-	}
-
-	// Prepare log data
-	logData, err := appData.prepLogData()
-	if err != nil {
-		log.Print(fmt.Errorf("prepLogData: %s", err.Error()))
-		return
-	}
-
-	// Fill log data
-	logData.RequestIP = c.IP()
-	logData.RequestPath = c.Path()
-	logData.RequestTime = time.Now()
-	logData.RequestMethod = c.Method()
-
-	err = addLogEntry(logData)
-	if err != nil {
-		log.Print(fmt.Errorf("addLogEntry: %s", err.Error()))
-	}
 }

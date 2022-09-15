@@ -1,3 +1,5 @@
 config/
 build/
 paypal/auth
+.vscode
+tmp
