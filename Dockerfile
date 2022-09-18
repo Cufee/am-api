@@ -7,7 +7,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o binary .
 
 ADD https://github.com/ahmetb/runsd/releases/download/v0.0.0-rc.15/runsd /runsd
-RUN chmod +x /bin/runsd
+RUN chmod +x /runsd
 
 FROM scratch
 
