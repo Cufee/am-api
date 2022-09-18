@@ -23,7 +23,7 @@ func main() {
 		AllowHeaders: "Origin, Content-Type, Accept",
 	}))
 
-	api := app.Group("/users/v1")
+	api := app.Group("/v1")
 
 	// Public endpoints
 	api.Get("/public/:realm/players/name/:nickname", h.HandlePublicPlayerCheckByName) // Check by name - Public
