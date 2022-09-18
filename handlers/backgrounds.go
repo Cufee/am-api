@@ -18,7 +18,7 @@ import (
 )
 
 // HTTP Client for outgoing requests
-var client = &http.Client{Timeout: 5 * time.Second, Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}}
+var client = &http.Client{Timeout: 10 * time.Second, Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}}
 
 // NSFW API response
 type nsfwRes struct {
