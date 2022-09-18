@@ -14,7 +14,6 @@ FROM scratch
 ENV TZ=Europe/Berlin
 ENV ZONEINFO=/zoneinfo.zip
 COPY --from=builder /app/runsd /bin/runsd
-COPY --from=builder /app/assets /assets
 COPY --from=builder /app/binary /
 COPY --from=builder /usr/local/go/lib/time/zoneinfo.zip /
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
