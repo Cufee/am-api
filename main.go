@@ -28,17 +28,14 @@ func main() {
 	// Public endpoints
 	api.Get("/public/:realm/players/name/:nickname", h.HandlePublicPlayerCheckByName) // Check by name - Public
 
-	// Generate API key - localhost only
-	api.Get("/keys/new", auth.GenerateKey)
-
 	// Referrals
 	api.Get("/referrals/new", auth.Validator, h.HandleNewReferral) // Generate new referral link
 	api.Get("/r/:refID", h.HandleReferralLink)                     // Redirect
 
 	// WG login routes
-	api.Get("/newlogin", auth.Validator, h.HandleWargamingNewLogin) // New login intent
-	api.Get("/login/r/:intentID", h.HandleWargamingRedirect)        // Redirect from WG
-	api.Get("/login/:intentID", h.HandleWargamingLogin)             // Login using intentID
+	api.Post("/newlogin", auth.Validator, h.HandleWargamingNewLogin) // New login intent
+	api.Get("/login/r/:intentID", h.HandleWargamingRedirect)         // Redirect from WG
+	api.Get("/login/:intentID", h.HandleWargamingLogin)              // Login using intentID
 
 	// Users
 	api.Get("/users/id/:discordID", auth.Validator, h.HandeleUserCheck)                       // Check
@@ -52,16 +49,6 @@ func main() {
 	// Backgrounds
 	api.Patch("/background/:discordID", auth.Validator, h.HandleSetNewBG)  // Set new
 	api.Delete("/background/:discordID", auth.Validator, h.HandleRemoveBG) // Delete
-
-	// Premium
-	api.Get("/premium/add", auth.Validator, h.HandleNewPremiumIntent)              // Add premium time
-	api.Get("/premium/newintent", auth.Validator, h.HandleNewPremiumIntent)        // Intent for user update
-	api.Get("/premium/redirect/:intentID", auth.Validator, h.HandleUpdateRedirect) // Commit using intentID
-
-	// // Payments
-	// api.Get("/payments/new/:discordID", paypal.HandleNewSub)                                                         // Start new payment intent
-	// api.Get("/payments/redirect", func(ctx *fiber.Ctx) error { return ctx.Redirect("https://aftermath.link", 301) }) // PayPal redirect
-	// api.Post("/payments/events", paypal.HandlePaymentEvent)
 
 	// Root
 	api.Get("/", func(ctx *fiber.Ctx) error { return ctx.Redirect("https://aftermath.link", 301) }) // Root redirect
