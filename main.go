@@ -43,8 +43,9 @@ func main() {
 	api.Patch("/users/id/:discordID/newdef/:playerID", auth.Validator, h.HandleNewDefaultPID) // New default PID
 
 	// Players
-	api.Get("/players/id/:playerID", auth.Validator, h.HandelePlayerCheckByID)     // Check by ID
-	api.Get("/players/name/:nickname", auth.Validator, h.HandelePlayerCheckByName) // Check by name
+	api.Get("/players/id/:playerID", auth.Validator, h.HandelePlayerCheckByID)                 // Check by ID
+	api.Get("/players/name/:nickname", auth.Validator, h.HandelePlayerCheckByName)             // Check by name -- LEGACY
+	api.Get("/players/:realm/name/:nickname", auth.Validator, h.HandlePublicPlayerCheckByName) // Check by name
 
 	// Backgrounds
 	api.Patch("/background/:discordID", auth.Validator, h.HandleSetNewBG)  // Set new
