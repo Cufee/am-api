@@ -148,7 +148,8 @@ func HandleWargamingLogin(c *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
-	return c.Redirect(redirectURL)
+	c.Send([]byte(fmt.Sprintf("Redirecting to %s, click this link manually if your browser does not redirect you automatically.", redirectURL)))
+	return c.Redirect(redirectURL, 301)
 }
 
 // HandleWargamingNewLogin -
